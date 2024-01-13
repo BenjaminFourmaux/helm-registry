@@ -1,4 +1,4 @@
-# Project Name
+# Helm registry
 A simple Helm registry for store and share Helm package
 \
 [![](https://img.shields.io/badge/Docker-compose?logo=docker&logoColor=white&color=blue)]()
