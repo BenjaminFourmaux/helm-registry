@@ -1,19 +1,26 @@
 # Project Name
-Default GitHub repository template for OpenSource project
+A simple Helm registry for store and share Helm package
 \
 [![](https://img.shields.io/badge/github-template?logo=github&color=gray)]()
 [![](https://badgen.net/badge/icon/docker?icon=docker&label)]()
 
+This project is for have a simple [Helm registry](https://helm.sh/docs/topics/chart_repository/) and a web admin UI for manage registry.
+There are 2 parts :
+- **Backend** : Build in Go, API for store Helm package
+- **Frontend** : Build in ReactJS, for Web UI to manage Helm registry
+
+These parts are Docker images, that you use and deploy him in Docker env.
+![](architecture.png)
 
 ## Get stated :rocket:
-Don't forget to change variables `{{repository.name}}` by the current values in template file (and ressource url).
+
 
 ## Version
-[![](https://badgen.net/github/tag/BenjaminFourmaux/{{repository.name}}?cache=600)](https://github.com/BenjaminFourmaux{{repository.name}}/tags) [![](https://badgen.net/github/release/BenjaminFourmaux/{{repository.name}}?cache=600)](https://github.com/BenjaminFourmaux/{{repository.name}}/releases)
+[![](https://badgen.net/github/tag/BenjaminFourmaux/helm-registry?cache=600)](https://github.com/BenjaminFourmauxhelm-registry/tags) [![](https://badgen.net/github/release/BenjaminFourmaux/helm-registry?cache=600)](https://github.com/BenjaminFourmaux/helm-registry/releases)
 - [coming soon][v1] First API version with basic actions
 
 ## Contributors 👪
-[![](https://badgen.net/github/contributors/BenjaminFourmaux/{{repository.name}})](https://github.com/BenjaminFourmaux/{{repository.name}}/graphs/contributors)
+[![](https://badgen.net/github/contributors/BenjaminFourmaux/helm-registry)](https://github.com/BenjaminFourmaux/helm-registry/graphs/contributors)
 - :crown: [Benjamin Fourmaux](https://github.com/BenjaminFourmaux)
 
 ## Licence ⚖️
@@ -25,4 +32,4 @@ You can:
 
 You must **Mention** the © Copyright if you use and modified code for your own profit. Thank you
 
-© {{date.year}} - {{repository.owner}} - All right reserved
+© 2004 - Benjamin Fourmaux -- Beruet - All right reserved
