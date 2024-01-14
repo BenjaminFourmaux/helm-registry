@@ -33,3 +33,7 @@ func Warning(message string) {
 func Error(message string) {
 	println(GetCurrentDatetime() + introducer + "ERROR" + separator + message)
 }
+
+func Raise(err string) {
+	println(err)
+}
