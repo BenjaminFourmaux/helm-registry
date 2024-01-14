@@ -32,6 +32,8 @@ func EndpointIndexYAML() {
 	indexFilePath := "index.yaml"
 
 	http.HandleFunc("/index.yaml", func(w http.ResponseWriter, req *http.Request) {
+		traceRequest(req)
+
 		w.Header().Set("Content-Type", "text/yaml")
 
 		// Open index.yaml file
@@ -46,11 +48,9 @@ func EndpointIndexYAML() {
 		if err != nil {
 			http.Error(w, fmt.Sprintf("Error %s", err), http.StatusInternalServerError)
 		}
-
-		traceRequest(req)
 	})
 }
 
 func traceRequest(req *http.Request) {
-	Logger.Info("Request to '" + req.URL.Path + "' - 200 OK")
+	Logger.Info("Request to '" + req.URL.Path + "'")
 }
