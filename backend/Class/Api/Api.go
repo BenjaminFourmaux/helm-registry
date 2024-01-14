@@ -46,5 +46,11 @@ func EndpointIndexYAML() {
 		if err != nil {
 			http.Error(w, fmt.Sprintf("Error %s", err), http.StatusInternalServerError)
 		}
+
+		traceRequest(req)
 	})
+}
+
+func traceRequest(req *http.Request) {
+	Logger.Info("Request to '" + req.URL.Path + "' - 200 OK")
 }
