@@ -11,9 +11,9 @@ func main() {
 	Logger.Info("Helm Registry - Started")
 
 	// Database
-	db := Database.OpenConnection("sqlite3", "./charts_info.db")
-	Database.CreateTableRegistry(db)
-	//Database.Fixtures(db) // Insert test fixtures
+	Database.OpenConnection("sqlite3", "./charts_info.db")
+	Database.CreateTableRegistry()
+	Database.Fixtures() // Insert test fixtures
 
 	// Endpoints registration
 	Logger.Info("Registering HTTP Endpoints")

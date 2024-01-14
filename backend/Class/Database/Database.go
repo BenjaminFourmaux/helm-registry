@@ -5,18 +5,20 @@ import (
 	"database/sql"
 )
 
-func OpenConnection(driver string, dataSource string) *sql.DB {
-	db, err := sql.Open(driver, dataSource)
+var db *sql.DB
+
+func OpenConnection(driver string, dataSource string) {
+	conn, err := sql.Open(driver, dataSource)
 	if err != nil {
 		Logger.Error("Fail to create/connect to the Database")
 	} else {
 		Logger.Success("Database connected")
 	}
 
-	return db
+	db = conn
 }
 
-func CreateTableRegistry(db *sql.DB) {
+func CreateTableRegistry() {
 	createTableSQL := `
 		CREATE TABLE IF NOT EXISTS registry (
 			id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -38,7 +40,7 @@ func CreateTableRegistry(db *sql.DB) {
 	}
 }
 
-func Fixtures(db *sql.DB) {
+func Fixtures() {
 	Logger.Info("Insert fixtures data")
 
 	insertFixturesSQL := `
