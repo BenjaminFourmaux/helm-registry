@@ -5,17 +5,17 @@ import (
 	"database/sql"
 )
 
-var db *sql.DB
+var DB *sql.DB
 
-func OpenConnection(driver string, dataSource string) {
+func OpenConnection(driver string, dataSource string) *sql.DB {
 	conn, err := sql.Open(driver, dataSource)
 	if err != nil {
 		Logger.Error("Fail to create/connect to the Database")
 	} else {
 		Logger.Success("Database connected")
 	}
-
-	db = conn
+	DB = conn
+	return conn
 }
 
 func CreateTableRegistry() {
@@ -33,7 +33,7 @@ func CreateTableRegistry() {
 		);
 	`
 
-	_, err := db.Exec(createTableSQL)
+	_, err := DB.Exec(createTableSQL)
 	if err != nil {
 		Logger.Error("Fail to create table 'registry'")
 		Logger.Raise(err.Error())
@@ -70,9 +70,13 @@ func Fixtures() {
 		);
 	`
 
-	_, err := db.Exec(insertFixturesSQL)
+	_, err := DB.Exec(insertFixturesSQL)
 	if err != nil {
 		Logger.Warning("Fail to insert fixtures")
 		Logger.Raise(err.Error())
 	}
+}
+
+func GetALlChartsOrderedByName() (*sql.Rows, error) {
+	return DB.Query(`SELECT * FROM registry GROUP BY name;`)
 }

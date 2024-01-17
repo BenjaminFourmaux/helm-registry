@@ -1,6 +1,7 @@
 package Api
 
 import (
+	"backend/Class/Directory"
 	"backend/Class/Logger"
 	"bytes"
 	"fmt"
@@ -29,7 +30,7 @@ func EndpointTest() {
 }
 
 func EndpointIndexYAML() {
-	indexFilePath := "index.yaml"
+	indexFilePath := os.Getenv("INDEX_FILE_PATH")
 
 	http.HandleFunc("/index.yaml", func(w http.ResponseWriter, req *http.Request) {
 		traceRequest(req)
@@ -37,14 +38,10 @@ func EndpointIndexYAML() {
 		w.Header().Set("Content-Type", "text/yaml")
 
 		// Open index.yaml file
-		file, err := os.ReadFile(indexFilePath)
-		if err != nil {
-			http.Error(w, fmt.Sprintf("Error %s", err), http.StatusInternalServerError)
-			Logger.Error("Enable to open file")
-		}
+		file := Directory.ReadFile(indexFilePath)
 
 		// Paste file in the HTTP response
-		_, err = io.Copy(w, bytes.NewReader(file))
+		_, err := io.Copy(w, bytes.NewReader(file))
 		if err != nil {
 			http.Error(w, fmt.Sprintf("Error %s", err), http.StatusInternalServerError)
 		}
