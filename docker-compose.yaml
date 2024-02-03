@@ -1,0 +1,26 @@
+version: '3'
+services:
+  repository:
+    container_name: repository
+    build: ./backend
+    command: /app/main
+    ports:
+      - "8080:8080"
+    networks:
+      - helm-net
+    volumes:
+      - ./backend:/go/src/app
+
+  testcontainer:
+    container_name: testcontainer
+    image: idukelu/helm:latest
+    tty: true
+    networks:
+      - helm-net
+    volumes:
+      - ./test:/test
+
+networks:
+  helm-net:
+    name: 'helm-net'
+    driver: bridge
