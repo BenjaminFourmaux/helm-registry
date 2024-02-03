@@ -1,8 +1,9 @@
 version: '3'
 services:
-  repository:
-    container_name: repository
+  registry:
+    container_name: registry
     build: ./backend
+    image: helm-registry
     command: /app/main
     ports:
       - "8080:8080"
