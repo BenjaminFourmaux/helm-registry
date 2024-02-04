@@ -1,25 +1,40 @@
-# This workflow will build a golang project
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-go
-
-name: build_go_package
+# CD Pipeline for build Windows and Linux Go packages of registry
+# Triggering : When a new release is created
+name: Go build packages - CD Pipeline
 
 on:
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+  release:
+    types:
+      - created
+
+env:
+  GO_VERSION : 1.21
+  WINDOWS_RELEASE : helm_registry-${{ github.event.release.tag_name }}-windows.exe
+  LINUX_RELEASE : helm_registry-${{ github.event.release.tag_name }}-linux
 
 jobs:
-
   build:
     runs-on: ubuntu-latest
+
     steps:
-    - uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v2
 
-    - name: Set up Go
-      uses: actions/setup-go@v4
-      with:
-        go-version: '1.20'
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: ${{ env.GO_VERSION }}
 
-    - name: Build
-      run: go build -v ./backend
+      - name: Build for Windows
+        run: GOOS=windows GOARCH=amd64 go build -o ${{env.WINDOWS_RELEASE}} ./backend
+
+      - name: Build for Linux
+        run: GOOS=linux GOARCH=amd64 go build -o ${{env.LINUX_RELEASE}} ./backend
+
+      - name: Create Release Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: helm_registry
+          path: |
+            ${{env.WINDOWS_RELEASE}}
+            ${{env.LINUX_RELEASE}}
