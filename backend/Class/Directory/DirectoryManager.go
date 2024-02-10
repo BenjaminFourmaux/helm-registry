@@ -4,22 +4,16 @@ import (
 	"backend/Class/Database"
 	"backend/Class/Logger"
 	"backend/Entity"
-	"database/sql"
 	"gopkg.in/yaml.v2"
 	"os"
 	"strings"
 	"time"
 )
 
-var DB *sql.DB
-
 func UpdateIndex() {
 	filePath := os.Getenv("INDEX_FILE_PATH")
 
-	// Step 1. Read the index YAML file
-	//fileContent := ReadFile(filePath)
-
-	// Step 2. Get registry info from Database
+	// Step 1. Get registry info from Database
 	rows, errSql := Database.GetALlChartsOrderedByName()
 	if errSql != nil {
 		Logger.Error("Enable to get data from Database")
@@ -32,7 +26,7 @@ func UpdateIndex() {
 		Generated:  time.Now(),
 	}
 
-	// Step 4. Foreach rows
+	// Step 2. Foreach rows
 	for rows.Next() {
 		var entry Entity.DTORegistry
 
@@ -59,7 +53,7 @@ func UpdateIndex() {
 
 	yamlData, _ := yaml.Marshal(&index)
 
-	// Step 5. Save index YAML file
+	// Step 3. Save index YAML file
 	SaveFile(filePath, yamlData)
 
 	Logger.Success("Index YAML file successfully updated")
