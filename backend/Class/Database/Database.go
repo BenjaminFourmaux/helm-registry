@@ -25,7 +25,7 @@ func CreateTableInfo() {
 		CREATE TABLE IF NOT EXISTS info (
 		    name TEXT NULL,
 		    description TEXT NULL,
-		    version TEXT NULL,
+		    version INT NULL,
 		    maintainer TEXT NULL,
 		    maintainer_url TEXT NULL,
 		    labels TEXT NULL
@@ -96,6 +96,31 @@ func Fixtures() {
 	_, err := DB.Exec(insertFixturesSQL)
 	if err != nil {
 		Logger.Warning("Fail to insert fixtures")
+		Logger.Raise(err.Error())
+	}
+}
+
+// InitInfo Insert in the table info, information about the registry from variables
+func InitInfo(name string, description string, version string, maintainer string, maintainer_url string, labels string) {
+	// Check if vars are not null
+	if name != "" || description != "" || version != "" || maintainer != "" || maintainer_url != "" || labels != "" {
+		Logger.Info("Insert registry information")
+	} else {
+		return
+	}
+
+	insertInfosSQL := `
+		INSERT INTO info (
+			name, description, version, maintainer, maintainer_url, labels        
+		)
+		VALUES (
+		    $1, $2, $3, $4, $5, $6
+		);
+	`
+
+	_, err := DB.Exec(insertInfosSQL, name, description, version, maintainer, maintainer_url, labels)
+	if err != nil {
+		Logger.Warning("Fail to insert registry information")
 		Logger.Raise(err.Error())
 	}
 }
