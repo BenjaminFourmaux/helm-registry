@@ -13,7 +13,7 @@ import (
 func StartServer() {
 	port := 8080
 
-	err := http.ListenAndServe(fmt.Sprintf("localhost:%d", port), nil)
+	err := http.ListenAndServe(fmt.Sprintf(":%d", port), nil)
 	if err != nil {
 		Logger.Error("Fail to launch HTTP Server")
 		Logger.Raise(err.Error())
