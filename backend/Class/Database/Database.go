@@ -18,6 +18,27 @@ func OpenConnection(driver string, dataSource string) *sql.DB {
 	return conn
 }
 
+// <editor-fold desc="Create Tables"> Create Tables
+
+func CreateTableInfo() {
+	createTableSQL := `
+		CREATE TABLE IF NOT EXISTS info (
+		    name TEXT NULL,
+		    description TEXT NULL,
+		    version TEXT NULL,
+		    maintainer TEXT NULL,
+		    maintainer_url TEXT NULL,
+		    labels TEXT NULL
+		);
+	`
+
+	_, err := DB.Exec(createTableSQL)
+	if err != nil {
+		Logger.Error("Fail to create table 'info'")
+		Logger.Raise(err.Error())
+	}
+}
+
 func CreateTableRegistry() {
 	createTableSQL := `
 		CREATE TABLE IF NOT EXISTS registry (
@@ -39,6 +60,8 @@ func CreateTableRegistry() {
 		Logger.Raise(err.Error())
 	}
 }
+
+// </editor-fold>
 
 func Fixtures() {
 	Logger.Info("Insert fixtures data")
@@ -75,8 +98,4 @@ func Fixtures() {
 		Logger.Warning("Fail to insert fixtures")
 		Logger.Raise(err.Error())
 	}
-}
-
-func GetALlChartsOrderedByName() (*sql.Rows, error) {
-	return DB.Query(`SELECT * FROM registry GROUP BY name;`)
 }
