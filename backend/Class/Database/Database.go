@@ -18,6 +18,27 @@ func OpenConnection(driver string, dataSource string) *sql.DB {
 	return conn
 }
 
+// <editor-fold desc="Create Tables"> Create Tables
+
+func CreateTableInfo() {
+	createTableSQL := `
+		CREATE TABLE IF NOT EXISTS info (
+		    name TEXT NULL,
+		    description TEXT NULL,
+		    version INT NULL,
+		    maintainer TEXT NULL,
+		    maintainer_url TEXT NULL,
+		    labels TEXT NULL
+		);
+	`
+
+	_, err := DB.Exec(createTableSQL)
+	if err != nil {
+		Logger.Error("Fail to create table 'info'")
+		Logger.Raise(err.Error())
+	}
+}
+
 func CreateTableRegistry() {
 	createTableSQL := `
 		CREATE TABLE IF NOT EXISTS registry (
@@ -39,6 +60,8 @@ func CreateTableRegistry() {
 		Logger.Raise(err.Error())
 	}
 }
+
+// </editor-fold>
 
 func Fixtures() {
 	Logger.Info("Insert fixtures data")
@@ -77,6 +100,27 @@ func Fixtures() {
 	}
 }
 
-func GetALlChartsOrderedByName() (*sql.Rows, error) {
-	return DB.Query(`SELECT * FROM registry GROUP BY name;`)
+// InitInfo Insert in the table info, information about the registry from variables
+func InitInfo(name string, description string, version string, maintainer string, maintainer_url string, labels string) {
+	// Check if vars are not null
+	if name != "" || description != "" || version != "" || maintainer != "" || maintainer_url != "" || labels != "" {
+		Logger.Info("Insert registry information")
+	} else {
+		return
+	}
+
+	insertInfosSQL := `
+		INSERT INTO info (
+			name, description, version, maintainer, maintainer_url, labels        
+		)
+		VALUES (
+		    $1, $2, $3, $4, $5, $6
+		);
+	`
+
+	_, err := DB.Exec(insertInfosSQL, name, description, version, maintainer, maintainer_url, labels)
+	if err != nil {
+		Logger.Warning("Fail to insert registry information")
+		Logger.Raise(err.Error())
+	}
 }
