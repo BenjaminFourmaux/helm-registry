@@ -3,7 +3,7 @@
 # ===========
 # Variables
 # ===========
-REGISTRY_URL="http://repository:8080"
+REGISTRY_URL="http://registry:8080"
 
 # ===========
 # Functions
@@ -22,7 +22,7 @@ printTest() {
 printTest "0" "Check API is up"
 if ! curl -s -o /dev/null -w "%{http_code}" $REGISTRY_URL | grep -q "200"; then
     echo "Registry is down"
-    # exit 1
+    exit 1
 else
     echo "Registry is up"
 fi
