@@ -2,14 +2,11 @@ FROM golang:1.21-bullseye
 
 WORKDIR /app
 
-# Copy go mod file
-COPY go.mod .
+# Copy source code file and folder
+COPY . .
 
 # Install go modules
 RUN go mod download
-
-# Copy the source code
-COPY . .
 
 # Build the application
 RUN go build -o main .
