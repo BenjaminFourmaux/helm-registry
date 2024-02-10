@@ -34,6 +34,7 @@ func main() {
 
 	// Endpoints registration
 	Logger.Info("Registering HTTP Endpoints")
+	Api.EndpointRoot()
 	Api.EndpointTest()
 	Api.EndpointIndexYAML()
 
