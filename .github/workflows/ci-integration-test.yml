@@ -1,0 +1,40 @@
+name: CI - Integration tests
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+env:
+  TEST_IMAGE: idukelu/helm:latest
+  REGISTRY_URL: http://regitry:8080
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+
+    # Build application image (tag: test)
+    - name: Build application image
+      run: docker build . --file backend/Dockerfile --tag helm-registry:test
+
+    # Run apllication container
+    - name: Run application container
+      run: docker run --name registry -d helm-registry:test
+
+    # Pull test image
+    - name: Pull test image
+      run: docker pull ${{env.TEST_IMAGE}}
+
+    # Run test container
+    - name: Run test container
+      run: docker run --name testcontainer -d ${{env.TEST_IMAGE}}
+
+    # Testing Commands
+
+    # Test 1 - Repo add
+    - name: Test 1 - Repo add
+      run: docker exec -it testcontainer helm add ${{env.REGISTRY_URL}}
+  
