@@ -22,12 +22,18 @@ jobs:
         run: docker build -t registry:test .
       - name: Show images 
         run: docker image ls
-      
+       
+  check: 
+    runs-on: ubutu-latest
+    steps:
+    - name: Show images 
+      run: docker image ls
 
   run-containers:
     needs: build
     runs-on: ubuntu-latest
-    container: localhost/registry:test
+    container: 
+      image: registry:test
     steps:
       - name: is running ?
         run: echo "Containter is running"
@@ -35,8 +41,7 @@ jobs:
   tests:
     needs: run-containers
     runs-on: ubuntu-latest
-    container: 
-      image: ${{ github.env.TEST_IMAGE }}
+    container: ${{ github.env.TEST_IMAGE }}
     steps:
       - name: Run tests
         run: helm add repo testrepo ${{ github.env.REGISTRY_URL }}
