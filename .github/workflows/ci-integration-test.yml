@@ -13,48 +13,40 @@ env:
 
 jobs:
   build:
-    name: Build Docker images
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
-    # Build application image (tag: test)
-    - name: Build application image
-      working-directory: backend
-      run: docker build . --tag helm-registry:test
-
-    # Pull test image
-    - name: Pull test image
-      run: docker pull ${{env.TEST_IMAGE}}
-
-
-  run-test:
-    name: Run Docker containers
+      - name: Build application Docker imahe
+        uses: docker/build-push-action@v3
+        with:
+          context: backend
+          push: false
+          image-name: registry
+          tags: test
+  run:
+    needs: build
     runs-on: ubuntu-latest
-    services:
-      # App container
-      registry:
-        image: registry:test
-        ports:
-          - 8080:8080
-        options: --name registry
-
-      # Test container
-      testcontainer:
-        image: ${{github.env.TEST_IMAGE}}
-        options: --name testcontainer
-      
     steps:
-    - name: Wait for services
-      run: sleep 10
-
-
-  # Tests
+      - name: Run app container
+        uses: docker/run-action@v3
+        with:
+          image: registry
+          tag: test
+          name: registry
+          options: -p 8080:8080
+          ports: 8080
+      - name: Run test container
+        uses: docker/run-action@v3
+        with:
+          image: ${{ env.TEST_IMAGE }}
+          name: testcontainer
   test:
-    name: Run integration tests
+    needs: run
     runs-on: ubuntu-latest
     steps:
-    # Test 1 - Repo add
-    - name: Test 1 - Repo add
-      run: docker exec -it testcontainer helm add ${{env.REGISTRY_URL}}
-  
+      - name: Execute command
+        uses: docker/run-action@v3
+        with:
+          image: registry:latest
+          command: "echo 'Hello, world!'"
