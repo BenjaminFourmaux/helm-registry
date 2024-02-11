@@ -9,7 +9,7 @@ on:
 
 env:
   TEST_IMAGE: idukelu/helm:latest
-  REGISTRY_URL: http://127.0.0.1:8080
+  REGISTRY_URL: http://test:8080
 
 jobs:
   test:
