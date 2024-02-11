@@ -9,7 +9,7 @@ on:
 
 env:
   TEST_IMAGE: idukelu/helm:latest
-  REGISTRY_URL: http://localhost:8080
+  REGISTRY_URL: http://127.0.0.1:8080
 
 jobs:
   test:
@@ -30,7 +30,7 @@ jobs:
       
       - name: Run App
         working-directory: ./backend
-        run: go run main.go & sleep 10
+        run: go run main.go & sleep 15
       
       # Run tests
       - name: Test 1 - Repo add
