@@ -35,7 +35,8 @@ jobs:
   tests:
     needs: run-containers
     runs-on: ubuntu-latest
-    container: ${{ github.env.TEST_IMAGE }}
+    container: 
+      image: ${{ github.env.TEST_IMAGE }}
     steps:
       - name: Run tests
         run: helm add repo testrepo ${{ github.env.REGISTRY_URL }}
