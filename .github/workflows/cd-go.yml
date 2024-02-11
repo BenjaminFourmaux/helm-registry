@@ -1,6 +1,6 @@
 # CD Pipeline for build Windows and Linux Go packages of registry
 # Triggering : When a new release is created
-name: Go build packages - CD Pipeline
+name: CD - Go - Build packages 
 
 on:
   release:
