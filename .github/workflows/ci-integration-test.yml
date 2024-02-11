@@ -19,7 +19,8 @@ jobs:
 
     # Build application image (tag: test)
     - name: Build application image
-      run: docker build . --file backend/Dockerfile --tag helm-registry:test
+      working-directory: backend
+      run: docker build . --tag helm-registry:test
 
     # Run apllication container
     - name: Run application container
