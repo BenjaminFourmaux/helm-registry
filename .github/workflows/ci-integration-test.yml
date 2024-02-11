@@ -13,6 +13,7 @@ env:
 
 jobs:
   build:
+    name: Build Docker images
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
@@ -22,20 +23,31 @@ jobs:
       working-directory: backend
       run: docker build . --tag helm-registry:test
 
-    # Run apllication container
-    - name: Run application container
-      run: docker run --name registry -d helm-registry:test
-
     # Pull test image
     - name: Pull test image
       run: docker pull ${{env.TEST_IMAGE}}
 
-    # Run test container
-    - name: Run test container
-      run: docker run --name testcontainer -d ${{env.TEST_IMAGE}}
+  run-test:
+    name: Run Docker containers
+    runs-on: ubuntu-latest
+    services:
+      # App container
+      registry:
+        image: registry:test
+        ports:
+          - 8080:8080
+        options: --name registry
 
-    # Testing Commands
+      # Test container
+      testcontainer:
+        image: ${{github.env.TEST_IMAGE}}
+        options: --name testcontainer
 
+  # Tests
+  test:
+    name: Run integration tests
+    runs-on: ubuntu-latest
+    steps:
     # Test 1 - Repo add
     - name: Test 1 - Repo add
       run: docker exec -it testcontainer helm add ${{env.REGISTRY_URL}}
