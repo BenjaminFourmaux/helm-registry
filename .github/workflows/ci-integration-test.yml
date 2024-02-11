@@ -34,7 +34,7 @@ jobs:
       
       # Check if the app is running
       - name: Test 0 - Check localhost
-        run: curl http://localhost
+        run: ping -c 4 localhost
 
       # Run tests
       - name: Test 1 - Repo add
