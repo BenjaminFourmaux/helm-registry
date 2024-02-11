@@ -1,0 +1,6 @@
+# Ignore Docker build context files
+.dockerignore
+Dockerfile
+
+# Database files
+*.db
