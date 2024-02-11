@@ -3,7 +3,7 @@ A simple Helm registry for store and share Helm package
 \
 [![](https://img.shields.io/badge/Docker-compose?logo=docker&logoColor=white&color=blue)]()
 [![](https://img.shields.io/badge/registry-helm?logo=helm&logoColor=white&label=Helm&labelColor=darkblue&color=white)]()
-[![](https://img.shields.io/badge/Golang-1.23.3-grey?style=for-the-badge&logo=go&labelColor=cyan)]()
+[![](https://img.shields.io/badge/Golang-1.21.6-grey?style=for-the-badge&logo=go&labelColor=cyan)]()
 
 
 This project is for have a simple [Helm registry](https://helm.sh/docs/topics/chart_repository/) and a web admin UI for manage registry.
