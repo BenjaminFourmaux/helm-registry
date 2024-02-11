@@ -9,30 +9,29 @@ on:
 
 env:
   TEST_IMAGE: idukelu/helm:latest
-  REGISTRY_URL: http://regitry:8080
+  REGISTRY_URL: http://localhost:8080
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
-      - name: Build app image
-        working-directory: backend
-        run: docker build -t registry:test .
-
-  run-containers:
-    needs: build
-    runs-on: ubuntu-latest
-    container: registry:test
-    steps:
-      - name: is running ?
-        run: echo "Containter is running"
-
-  tests:
-    needs: run-containers
-    runs-on: ubuntu-latest
-    container: ${{ github.env.TEST_IMAGE }}
-    steps:
-      - name: Run tests
-        run: helm add repo testrepo ${{ github.env.REGISTRY_URL }}
+      - name: Install Golang
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.23.3
+       
+      - name: Install Helm
+        run: |
+          curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
+          chmod 700 get_helm.sh
+          ./get_helm.sh
+      
+      - name: Run App
+        working-directory: ./backend
+        run: go run main.go 
+      
+      # Run tests
+      - name: Test 1 - Repo add
+        run: helm repo add testrepo $REGISTRY_URL
