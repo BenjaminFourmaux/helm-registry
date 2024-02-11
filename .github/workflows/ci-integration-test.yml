@@ -13,48 +13,23 @@ env:
 
 jobs:
   build:
-    name: Build Docker images
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
-    # Build application image (tag: test)
-    - name: Build application image
-      working-directory: backend
-      run: docker build . --tag helm-registry:test
+      - name: Build app image
+        working-directory: backend
+        run: docker buimf -t registry:test .
 
-    # Pull test image
-    - name: Pull test image
-      run: docker pull ${{env.TEST_IMAGE}}
-
-
-  run-test:
-    name: Run Docker containers
+  run-containers:
+    needs: build
     runs-on: ubuntu-latest
-    services:
-      # App container
-      registry:
-        image: registry:test
-        ports:
-          - 8080:8080
-        options: --name registry
+    container: registry:test
 
-      # Test container
-      testcontainer:
-        image: ${{github.env.TEST_IMAGE}}
-        options: --name testcontainer
-      
-    steps:
-    - name: Wait for services
-      run: sleep 10
-
-
-  # Tests
-  test:
-    name: Run integration tests
+  tests:
+    needs: run-containers
     runs-on: ubuntu-latest
+    container: ${{ github.env.TEST_IMAGE }}
     steps:
-    # Test 1 - Repo add
-    - name: Test 1 - Repo add
-      run: docker exec -it testcontainer helm add ${{env.REGISTRY_URL}}
-  
+      - name: Run tests
+        run: helm add repo testrepo ${{ github.env.REGISTRY_URL }}
