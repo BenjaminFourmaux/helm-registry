@@ -34,7 +34,7 @@ jobs:
       
       # Check if the app is running
       - name: Test 0 - Check localhost
-        run: curl $REGISTRY_URL
+        run: curl http://localhost
 
       # Run tests
       - name: Test 1 - Repo add
