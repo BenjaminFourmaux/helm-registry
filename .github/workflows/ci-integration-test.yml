@@ -9,7 +9,7 @@ on:
 
 env:
   TEST_IMAGE: idukelu/helm:latest
-  REGISTRY_URL: http://test:8080
+  REGISTRY_URL: http://localhost:8080
 
 jobs:
   test:
@@ -32,6 +32,10 @@ jobs:
         working-directory: ./backend
         run: nohup go run main.go & sleep 20
       
+      # Check if the app is running
+      - name: Test 0 - Check localhost
+        run: curl $REGISTRY_URL
+
       # Run tests
       - name: Test 1 - Repo add
         run: helm repo add testrepo $REGISTRY_URL
