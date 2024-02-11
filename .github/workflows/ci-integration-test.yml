@@ -12,23 +12,24 @@ env:
   REGISTRY_URL: http://regitry:8080
 
 jobs:
-  test:
+  build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-  
+
       - name: Build app image
         working-directory: backend
-        run: docker build -t registry .
-  
-      - name: Run app container
-        run: docker run -d -p 8080:8080 registry
-  
-      - name: Run testcontainer
-        run: docker run -t --name testcontainer idukelu/helm:latest
-  
-      - name: Exec tests
-        run: |
-          docker exec -it testcontainer sh
-          helm add repo ${{ env.REGISTRY_URL }}
-  
+        run: docker buimf -t registry:test .
+
+  run-containers:
+    needs: build
+    runs-on: ubuntu-latest
+    container: registry:test
+
+  tests:
+    needs: run-containers
+    runs-on: ubuntu-latest
+    container: ${{ github.env.TEST_IMAGE }}
+    steps:
+      - name: Run tests
+        run: helm add repo testrepo ${{ github.env.REGISTRY_URL }}
