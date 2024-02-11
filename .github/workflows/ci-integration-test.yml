@@ -25,7 +25,7 @@ jobs:
         run: docker run -d -p 8080:8080 registry
   
       - name: Run testcontainer
-        run: docker run --name testcontainer idukelu/helm:latest
+        run: docker run -t --name testcontainer idukelu/helm:latest
   
       - name: Exec tests
         run: |
