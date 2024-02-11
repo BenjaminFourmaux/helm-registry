@@ -20,6 +20,9 @@ jobs:
       - name: Build app image
         working-directory: backend
         run: docker build -t registry:test .
+      - name: Show images 
+        run: docker image ls
+      
 
   run-containers:
     needs: build
