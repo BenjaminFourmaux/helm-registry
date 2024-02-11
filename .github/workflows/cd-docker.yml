@@ -1,5 +1,3 @@
-# CD Pipeline for build Docker image of the registry
-# Triggering : When a new release is created
 name: CD Docker
 
 on:
