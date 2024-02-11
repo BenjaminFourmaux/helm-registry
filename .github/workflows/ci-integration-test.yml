@@ -19,7 +19,7 @@ jobs:
 
       - name: Build app image
         working-directory: backend
-        run: docker buimf -t registry:test .
+        run: docker build -t registry:test .
 
   run-containers:
     needs: build
