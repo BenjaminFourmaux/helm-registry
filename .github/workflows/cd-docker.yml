@@ -1,6 +1,6 @@
 # CD Pipeline for build Docker image of the registry
 # Triggering : When a new release is created
-name: CD Docker
+name: CD - Docker - Build and save image
 
 on:
   release:
