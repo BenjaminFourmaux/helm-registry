@@ -1,0 +1,28 @@
+# CD Pipeline for build Docker image of the registry
+# Triggering : When a new release is created
+name: CD Docker
+
+on:
+  release:
+    types:
+      - created
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Build Docker image
+        run: docker build -t helm-registry:${{github.event.release.tag_name}} ./backend
+
+      - name: Save Docker image as tar
+        run: docker save helm-registry:${{github.event.release.tag_name}} -o helm-registry-${{github.event.release.tag_name}}.tar
+
+      - name: Upload Docker image as artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: helm_registry
+          path: helm-registry-${{github.event.release.tag_name}}.tar
