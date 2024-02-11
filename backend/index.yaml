@@ -22,4 +22,4 @@ entries:
     - https://github.com/helm/helm
     urls:
     - charts/toto/toto-1.1.0.tgz
-generated: 2024-01-17T23:44:16.6023844+01:00
+generated: 2024-02-10T19:12:08.4903962+01:00

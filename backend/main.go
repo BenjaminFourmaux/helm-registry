@@ -5,12 +5,9 @@ import (
 	"backend/Class/Database"
 	"backend/Class/Directory"
 	"backend/Class/Logger"
-	"database/sql"
 	_ "github.com/mattn/go-sqlite3"
 	"os"
 )
-
-var db *sql.DB
 
 func main() {
 	Logger.Info("Helm Registry - Started")
@@ -20,7 +17,16 @@ func main() {
 
 	// Database
 	Database.OpenConnection("sqlite3", "./charts_info.db")
+	Database.CreateTableInfo()
 	Database.CreateTableRegistry()
+	Database.InitInfo(
+		os.Getenv("REGISTRY_NAME"),
+		os.Getenv("REGISTRY_DESCRIPTION"),
+		os.Getenv("REGISTRY_VERSION"),
+		os.Getenv("REGISTRY_MAINTAINER"),
+		os.Getenv("REGISTRY_MAINTAINER_URL"),
+		os.Getenv("REGISTRY_LABELS"),
+	)
 	//Database.Fixtures() // Insert test fixtures
 
 	// Update file
@@ -28,6 +34,7 @@ func main() {
 
 	// Endpoints registration
 	Logger.Info("Registering HTTP Endpoints")
+	Api.EndpointRoot()
 	Api.EndpointTest()
 	Api.EndpointIndexYAML()
 

@@ -1,0 +1,38 @@
+name: CI - Integration tests
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+env:
+  TEST_IMAGE: idukelu/helm:latest
+  REGISTRY_URL: http://regitry:8080
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build app image
+        working-directory: backend
+        run: docker build -t registry:test .
+
+  run-containers:
+    needs: build
+    runs-on: ubuntu-latest
+    container: registry:test
+    steps:
+      - name: is running ?
+        run: echo "Containter is running"
+
+  tests:
+    needs: run-containers
+    runs-on: ubuntu-latest
+    container: ${{ github.env.TEST_IMAGE }}
+    steps:
+      - name: Run tests
+        run: helm add repo testrepo ${{ github.env.REGISTRY_URL }}
