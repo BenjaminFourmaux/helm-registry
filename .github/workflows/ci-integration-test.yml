@@ -27,6 +27,7 @@ jobs:
     - name: Pull test image
       run: docker pull ${{env.TEST_IMAGE}}
 
+
   run-test:
     name: Run Docker containers
     runs-on: ubuntu-latest
@@ -42,6 +43,11 @@ jobs:
       testcontainer:
         image: ${{github.env.TEST_IMAGE}}
         options: --name testcontainer
+      
+    steps:
+    - name: Wait for services
+      run: sleep 10
+
 
   # Tests
   test:
