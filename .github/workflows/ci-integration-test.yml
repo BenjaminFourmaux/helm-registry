@@ -25,6 +25,7 @@ jobs:
        
   check: 
     runs-on: ubutu-latest
+    needs: build
     steps:
     - name: Show images 
       run: docker image ls
