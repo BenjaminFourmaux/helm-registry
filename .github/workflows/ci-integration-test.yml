@@ -15,7 +15,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Build app image
         working-directory: backend
@@ -25,6 +25,9 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     container: registry:test
+    steps:
+      - name: is running ?
+        run: echo "Containter is running"
 
   tests:
     needs: run-containers
