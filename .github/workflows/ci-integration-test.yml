@@ -24,7 +24,7 @@ jobs:
   run-containers:
     needs: build
     runs-on: ubuntu-latest
-    container: registry:test
+    container: localhost/registry:test
     steps:
       - name: is running ?
         run: echo "Containter is running"
