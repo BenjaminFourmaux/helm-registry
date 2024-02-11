@@ -30,7 +30,7 @@ jobs:
       
       - name: Run App
         working-directory: ./backend
-        run: go run main.go & sleep 15
+        run: nohup go run main.go & sleep 20
       
       # Run tests
       - name: Test 1 - Repo add
