@@ -9,32 +9,32 @@ on:
 
 env:
   TEST_IMAGE: idukelu/helm:latest
-  REGISTRY_URL: http://localhost:8080
+  REGISTRY_URL: http://127.0.0.1:8080
 
 jobs:
   test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
-      - name: Install Golang
-        uses: actions/setup-go@v2
-        with:
-          go-version: 1.21.6
        
+      # Install Helm on VM 
       - name: Install Helm
         run: |
           curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
           chmod 700 get_helm.sh
           ./get_helm.sh
       
-      - name: Run App
+      # Build Docker image from backend directory
+      - name: Build app Docker image
         working-directory: ./backend
-        run: nohup go run main.go & sleep 20
+        run: docker build -t registry:test .
+      
+      - name: Run Docker container
+        run: docker run -d -p 8080:8080 registry:test
       
       # Check if the app is running
-      - name: Test 0 - Check localhost
-        run: ping -c 4 localhost
+      - name: Test 0 - Check container is running
+        run: docker ps | grep registry:test
 
       # Run tests
       - name: Test 1 - Repo add
