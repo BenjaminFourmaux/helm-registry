@@ -17,25 +17,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
        
-      # Install Helm on VM 
-      - name: Install Helm
-        run: |
-          curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
-          chmod 700 get_helm.sh
-          ./get_helm.sh
-      
-      # Build Docker image from backend directory
-      - name: Build app Docker image
-        working-directory: ./backend
-        run: docker build -t registry:test .
-      
-      - name: Run Docker container
-        run: docker run -d -p 50586:8080 registry:test
-      
-      # Check if the app is running
-      - name: Test 0 - Check container is running
-        run: docker ps | grep registry:test
-
-      # Run tests
-      - name: Test 1 - Repo add
-        run: helm repo add testrepo $REGISTRY_URL
+      - uses: adambirds/docker-compose-action@v1.3.0
+        with:
+          compose-file: docker-compose.yml
+          test-container: testcontainer
