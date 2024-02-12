@@ -9,7 +9,7 @@ on:
 
 env:
   TEST_IMAGE: idukelu/helm:latest
-  REGISTRY_URL: http://127.0.0.1:8081
+  REGISTRY_URL: http://127.0.0.1:50586
 
 jobs:
   test:
@@ -30,7 +30,7 @@ jobs:
         run: docker build -t registry:test .
       
       - name: Run Docker container
-        run: docker run -d -p 8081:8080 registry:test
+        run: docker run -d -p 50586:8080 registry:test
       
       # Check if the app is running
       - name: Test 0 - Check container is running
