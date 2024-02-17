@@ -1,0 +1,116 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-config-map
+  namespace: {{.Values.namespace}}
+data:
+  nginx.conf: |
+    user nginx;
+    worker_processes auto;
+    events {}
+
+    http {
+      log_format custom '$remote_addr - $remote_user [$time_local] '
+                      '"$request" $status $body_bytes_sent '
+                      '"$http_referer" "$http_user_agent" '
+                      '"Headers:" "$http_x_source_ip" "$http_x_source_port"';
+
+      server {
+        listen 80;
+        location / {
+          access_log /var/log/nginx/access.log custom;
+        }
+      }
+    }
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-html-page
+  namespace: {{.Values.namespace}}
+data:
+  index.html: |
+    &lt;!DOCTYPE html&gt;
+    &lt;html&gt;
+    &lt;head&gt;
+      &lt;title&gt;HTTP Headers&lt;/title&gt;
+    &lt;/head&gt;
+    &lt;body&gt;
+
+    &lt;h1&gt;HTTP Headers&lt;/h1&gt;
+    &lt;pre id="headers"&gt;&lt;/pre&gt;
+
+    &lt;script&gt;
+    // Fonction pour afficher les en-têtes HTTP
+    function displayHeaders() {
+      var headers = '';
+      for (var key in window.navigator) {
+        if (key.indexOf("Headers") &gt; -1) {
+          headers += key + ': ' + window.navigator[key] + '\n';
+        }
+      }
+      document.getElementById("headers").textContent = headers;
+    }
+
+    // Appel de la fonction lors du chargement de la page
+    window.onload = displayHeaders;
+    &lt;/script&gt;
+
+    &lt;/body&gt;
+    &lt;/html&gt;
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+  namespace: {{.Values.namespace}}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      serviceAccountName: ngnix-sa
+      containers:
+        - name: nginx
+          image: nginx:latest
+          securityContext:
+            privileged: true
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - name: nginx-config
+              mountPath: /etc/nginx/nginx.conf
+              subPath: nginx.conf
+            - name: index-page
+              mountPath: /etc/nginx/html/index.html
+              subPath: index.html
+      volumes:
+        - name: nginx-config
+          configMap:
+            name: nginx-config-map
+            items:
+              - key: nginx.conf
+                path: nginx.conf
+        - name: index-page
+          configMap:
+            name: nginx-html-page
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-service
+  namespace: {{.Values.namespace}}
+spec:
+  selector:
+    app: nginx
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+  type: ClusterIP
