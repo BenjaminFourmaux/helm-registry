@@ -19,14 +19,14 @@ func UpdateIndex() {
 		Logger.Error("Enable to get data from Database")
 	}
 
-	// Step 3. Build the file
+	// Step 2. Build the file
 	index := Entity.Index{
 		APIVersion: "v1",
 		Entries:    make(map[string][]Entity.ChartEntry),
 		Generated:  time.Now(),
 	}
 
-	// Step 2. Foreach rows
+	// Step 3. Foreach rows
 	for rows.Next() {
 		var entry Entity.DTORegistry
 
@@ -53,7 +53,7 @@ func UpdateIndex() {
 
 	yamlData, _ := yaml.Marshal(&index)
 
-	// Step 3. Save index YAML file
+	// Step 4. Save index YAML file
 	SaveFile(filePath, yamlData)
 
 	Logger.Success("Index YAML file successfully updated")
