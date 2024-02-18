@@ -37,6 +37,7 @@ func main() {
 	Api.EndpointRoot()
 	Api.EndpointTest()
 	Api.EndpointIndexYAML()
+	Api.EndpointCharts()
 
 	// Start HTTP Server
 	Logger.Info("Start HTTP Server")
