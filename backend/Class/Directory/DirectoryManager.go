@@ -4,7 +4,6 @@ import (
 	"backend/Class/Database"
 	"backend/Class/Logger"
 	"backend/Entity"
-	"fmt"
 	"gopkg.in/yaml.v2"
 	"os"
 	"reflect"
@@ -92,9 +91,6 @@ func CheckChange(oldYaml *Entity.Index, newYaml *Entity.Index) bool {
 	// Remove 'generated' field
 	oldYaml.Generated = time.Time{}
 	newYaml.Generated = time.Time{}
-
-	fmt.Println(oldYaml.Generated)
-	fmt.Println(newYaml.Generated)
 
 	return !reflect.DeepEqual(*oldYaml, *newYaml)
 }

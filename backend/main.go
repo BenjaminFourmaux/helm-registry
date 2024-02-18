@@ -5,6 +5,7 @@ import (
 	"backend/Class/Database"
 	"backend/Class/Directory"
 	"backend/Class/Logger"
+	"backend/Class/Utils"
 	_ "github.com/mattn/go-sqlite3"
 	"os"
 )
@@ -12,8 +13,8 @@ import (
 func main() {
 	Logger.Info("Helm Registry - Started")
 
-	// Get env var
-	os.Setenv("INDEX_FILE_PATH", "index.yaml")
+	// Setup env
+	Utils.SetupEnv()
 
 	// Database
 	Database.OpenConnection("sqlite3", "./charts_info.db")
