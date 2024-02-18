@@ -4,8 +4,10 @@ import (
 	"backend/Class/Database"
 	"backend/Class/Logger"
 	"backend/Entity"
+	"fmt"
 	"gopkg.in/yaml.v2"
 	"os"
+	"reflect"
 	"strings"
 	"time"
 )
@@ -51,12 +53,22 @@ func UpdateIndex() {
 		index.Entries[entry.Name] = append(index.Entries[entry.Name], chartEntry)
 	}
 
-	yamlData, _ := yaml.Marshal(&index)
+	// Step 4. Check if change needed
+	yamlFile := &Entity.Index{}
+	err := yaml.Unmarshal(ReadFile(filePath), yamlFile)
+	if err != nil {
+		Logger.Error("Impossible to unmarshal the index file")
+	}
 
-	// Step 4. Save index YAML file
-	SaveFile(filePath, yamlData)
+	if CheckChange(yamlFile, &index) {
+		index.Generated = time.Now()
+		yamlData, _ := yaml.Marshal(&index)
 
-	Logger.Success("Index YAML file successfully updated")
+		// Step 5. Save index YAML file
+		SaveFile(filePath, yamlData)
+
+		Logger.Success("Index YAML file successfully updated")
+	}
 }
 
 func ReadFile(filePath string) []byte {
@@ -73,4 +85,16 @@ func SaveFile(filePath string, data []byte) {
 	if err != nil {
 		Logger.Error("Fail to save file : " + filePath)
 	}
+}
+
+// CheckChange Compare oldYaml with newYaml and return true if there are a change
+func CheckChange(oldYaml *Entity.Index, newYaml *Entity.Index) bool {
+	// Remove 'generated' field
+	oldYaml.Generated = time.Time{}
+	newYaml.Generated = time.Time{}
+
+	fmt.Println(oldYaml.Generated)
+	fmt.Println(newYaml.Generated)
+
+	return !reflect.DeepEqual(*oldYaml, *newYaml)
 }
