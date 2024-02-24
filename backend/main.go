@@ -5,28 +5,27 @@ import (
 	"backend/Class/Database"
 	"backend/Class/Directory"
 	"backend/Class/Logger"
-	"backend/Class/Utils"
+	"backend/Class/Utils/env"
 	_ "github.com/mattn/go-sqlite3"
-	"os"
 )
 
 func main() {
 	Logger.Info("Helm Registry - Started")
 
 	// Setup env
-	Utils.SetupEnv()
+	env.SetupEnv()
 
 	// Database
 	Database.OpenConnection("sqlite3", "./charts_info.db")
 	Database.CreateTableInfo()
 	Database.CreateTableRegistry()
 	Database.InitInfo(
-		os.Getenv("REGISTRY_NAME"),
-		os.Getenv("REGISTRY_DESCRIPTION"),
-		os.Getenv("REGISTRY_VERSION"),
-		os.Getenv("REGISTRY_MAINTAINER"),
-		os.Getenv("REGISTRY_MAINTAINER_URL"),
-		os.Getenv("REGISTRY_LABELS"),
+		env.REGISTRY_NAME,
+		env.REGISTRY_DESCRIPTION,
+		env.REGISTRY_VERSION,
+		env.REGISTRY_MAINTAINER,
+		env.REGISTRY_MAINTAINER_URL,
+		env.REGISTRY_LABELS,
 	)
 	//Database.Fixtures() // Insert test fixtures
 
