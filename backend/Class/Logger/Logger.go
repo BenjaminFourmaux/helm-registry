@@ -37,3 +37,7 @@ func Error(message string) {
 func Raise(err string) {
 	println(err)
 }
+
+func Separator() {
+	println("----------------------------------")
+}

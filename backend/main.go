@@ -41,5 +41,6 @@ func main() {
 
 	// Start HTTP Server
 	Logger.Info("Start HTTP Server")
+	Logger.Separator()
 	Api.StartServer()
 }
