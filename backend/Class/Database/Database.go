@@ -20,9 +20,9 @@ func OpenConnection(driver string, dataSource string) *sql.DB {
 
 // <editor-fold desc="Create Tables"> Create Tables
 
-func CreateTableInfo() {
+func CreateTableRegistry() {
 	createTableSQL := `
-		CREATE TABLE IF NOT EXISTS info (
+		CREATE TABLE IF NOT EXISTS registry (
 		    name TEXT NULL,
 		    description TEXT NULL,
 		    version INT NULL,
@@ -34,14 +34,14 @@ func CreateTableInfo() {
 
 	_, err := DB.Exec(createTableSQL)
 	if err != nil {
-		Logger.Error("Fail to create table 'info'")
+		Logger.Error("Fail to create table 'registry'")
 		Logger.Raise(err.Error())
 	}
 }
 
-func CreateTableRegistry() {
+func CreateTableCharts() {
 	createTableSQL := `
-		CREATE TABLE IF NOT EXISTS registry (
+		CREATE TABLE IF NOT EXISTS charts (
 			id INTEGER PRIMARY KEY AUTOINCREMENT,
 			name TEXT NOT NULL,
 			description TEXT NULL,
@@ -56,7 +56,7 @@ func CreateTableRegistry() {
 
 	_, err := DB.Exec(createTableSQL)
 	if err != nil {
-		Logger.Error("Fail to create table 'registry'")
+		Logger.Error("Fail to create table 'charts'")
 		Logger.Raise(err.Error())
 	}
 }
@@ -67,7 +67,7 @@ func Fixtures() {
 	Logger.Info("Insert fixtures data")
 
 	insertFixturesSQL := `
-		INSERT INTO registry (
+		INSERT INTO charts (
 			id, name, description, version, created, digest, home, sources, urls                 
 		) 
 		VALUES (
@@ -75,7 +75,7 @@ func Fixtures() {
 			'2016-10-06T16:23:20.499543808-06:00', '515c58e5f79d8b2913a10cb400ebb6fa9c77fe713287afbacf1a0b897cd78727',
 		    'https://helm.sh/helm', 'https://github.com/helm/helm', 'charts/test/test-0.1.0.tgz' 
 		);
-		INSERT INTO registry (
+		INSERT INTO charts (
 			id, name, description, version, created, digest, home, sources, urls                 
 		) 
 		VALUES (
@@ -83,7 +83,7 @@ func Fixtures() {
 			'2016-10-06T16:23:20.499814565-06:00', '99c76e403d752c84ead610644c4b1c2f2b453a74b921f422b9dcb8a7c8b559cd',
 		    'https://helm.sh/helm', 'https://github.com/helm/helm', 'charts/test/test-0.2.0.tgz' 
 		);
-		INSERT INTO registry (
+		INSERT INTO charts (
 			id, name, description, version, created, digest, home, sources, urls                 
 		) 
 		VALUES (
@@ -110,7 +110,7 @@ func InitInfo(name string, description string, version string, maintainer string
 	}
 
 	insertInfosSQL := `
-		INSERT INTO info (
+		INSERT INTO registry (
 			name, description, version, maintainer, maintainer_url, labels        
 		)
 		VALUES (

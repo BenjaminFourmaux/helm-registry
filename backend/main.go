@@ -17,7 +17,7 @@ func main() {
 
 	// Database
 	Database.OpenConnection("sqlite3", "./charts_info.db")
-	Database.CreateTableInfo()
+	Database.CreateTableCharts()
 	Database.CreateTableRegistry()
 	Database.InitInfo(
 		env.REGISTRY_NAME,
