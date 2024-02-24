@@ -29,6 +29,9 @@ func main() {
 	)
 	//Database.Fixtures() // Insert test fixtures
 
+	// Charts discovery
+	Directory.RepositoryDirectoryWatcher()
+
 	// Update file
 	Directory.UpdateIndex()
 

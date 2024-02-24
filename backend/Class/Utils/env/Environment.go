@@ -58,8 +58,6 @@ func SetupEnv() {
 		} else {
 			Logger.Success("Creating REPOSITORY_DIR on : " + REPOSITORY_DIR)
 		}
-	} else {
-		Logger.Write(REPOSITORY_DIR)
 	}
 }
 
