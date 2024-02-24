@@ -31,7 +31,7 @@ func UpdateIndex() {
 
 	// Step 3. Foreach rows
 	for rows.Next() {
-		var entry Entity.DTOChart
+		var entry Entity.ChartDTO
 
 		if err := rows.Scan(&entry.Id, &entry.Name, &entry.Description, &entry.Version, &entry.Created, &entry.Digest,
 			&entry.Home, &entry.Sources, &entry.Urls); err != nil {

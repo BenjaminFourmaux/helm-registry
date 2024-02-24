@@ -4,7 +4,7 @@ import (
 	"time"
 )
 
-type DTOChart struct {
+type ChartDTO struct {
 	Id          int       `json:"id"`
 	Name        string    `json:"name"`
 	Description string    `json:"description"`
@@ -16,7 +16,7 @@ type DTOChart struct {
 	Urls        string    `json:"urls"`
 }
 
-type DTORegistry struct {
+type RegistryDTO struct {
 	Name          string `json:"name"`
 	Description   string `json:"description"`
 	Version       int    `json:"version"`

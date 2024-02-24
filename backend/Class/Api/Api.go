@@ -32,7 +32,7 @@ func StartServer() {
 func EndpointRoot() {
 	http.HandleFunc("/", func(w http.ResponseWriter, req *http.Request) {
 		traceRequest(req)
-		var infoDTO Entity.DTORegistry
+		var infoDTO Entity.RegistryDTO
 
 		w.Header().Set("Content-Type", "text/yaml")
 
