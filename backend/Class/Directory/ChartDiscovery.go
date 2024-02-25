@@ -55,13 +55,15 @@ func ActionTrigger(event fsnotify.Event) {
 	case "CREATE":
 		if IsATGZFile(event.Name) {
 			Logger.Info("Action - insert")
+
 			InsertDBFromNewFile(event.Name)
+
+			// Update index.yaml file after action triggering and database change
+			UpdateIndex()
 		}
 	case "REMOVE":
 		Logger.Info("Action - delete")
 	}
-	// Update index.yaml file after action triggering and database change
-	UpdateIndex()
 }
 
 // InsertDBFromNewFile Send to BD info of a new chart creating in the repository directory
@@ -73,6 +75,8 @@ func InsertDBFromNewFile(filepath string) {
 		return
 	}
 
+	defer file.Close()
+
 	// uncompressed file
 	uncompressedFile, err := gzip.NewReader(file)
 	if err != nil {
@@ -82,11 +86,6 @@ func InsertDBFromNewFile(filepath string) {
 	// Create the archive reader
 	tarReader := tar.NewReader(uncompressedFile)
 
-	// Check if is a Helm Chart package
-	//if !IsAChartPackage(tarReader) {
-	//return
-	//}
-
 	// Browse archive
 	for {
 		header, err := tarReader.Next()
@@ -94,7 +93,7 @@ func InsertDBFromNewFile(filepath string) {
 			break
 		}
 		if header.Typeflag == tar.TypeReg {
-			if header.Name == "Chart.yaml" || header.Name == "Chart.yml" {
+			if Utils.GetFilenameFromPath(header.Name) == "Chart.yaml" || Utils.GetFilenameFromPath(header.Name) == "Chart.yml" {
 				// Read the content of the file and unmarshal it in yaml format
 				var buf bytes.Buffer
 				if _, err := io.Copy(&buf, tarReader); err != nil {
@@ -104,7 +103,7 @@ func InsertDBFromNewFile(filepath string) {
 				var dataFile Entity.ChartFile
 				err := yaml.Unmarshal(buf.Bytes(), &dataFile)
 				if err != nil {
-					Logger.Error("Error in the YAML file, unable to deserialize")
+					Logger.Error("Error in the YAML file, unable to deserialize it")
 				}
 
 				// Create the DTO entity with the data from file

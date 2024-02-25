@@ -1,3 +1,14 @@
 apiVersion: v1
-entries: {}
-generated: 2024-02-24T19:50:20.2094727+01:00
+entries:
+  test-nginx:
+  - version: 1.0.0
+    created: 2024-02-25T20:13:17.9299041+01:00
+    name: test-nginx
+    description: A Helm chart for Kubernetes
+    digest: ""
+    home: ""
+    sources:
+    - ""
+    urls:
+    - /charts/test-nginx-1.0.0.tgz
+generated: 2024-02-25T20:13:17.9366713+01:00

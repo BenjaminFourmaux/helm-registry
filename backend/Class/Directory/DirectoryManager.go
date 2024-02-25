@@ -1,13 +1,11 @@
 package Directory
 
 import (
-	"archive/tar"
 	"backend/Class/Database"
 	"backend/Class/Logger"
+	"backend/Class/Utils/env"
 	"backend/Entity"
-	"fmt"
 	"gopkg.in/yaml.v2"
-	"io"
 	"os"
 	"reflect"
 	"strings"
@@ -15,12 +13,12 @@ import (
 )
 
 func UpdateIndex() {
-	filePath := os.Getenv("INDEX_FILE_PATH")
+	filePath := env.INDEX_FILE_PATH
 
 	// Step 1. Get registry info from Database
 	rows, errSql := Database.GetALlChartsOrderedByName()
 	if errSql != nil {
-		Logger.Error("Enable to get data from Database")
+		Logger.Error("Unable to get data from Database")
 	}
 
 	// Step 2. Build the file
@@ -76,7 +74,7 @@ func UpdateIndex() {
 func ReadFile(filePath string) []byte {
 	file, err := os.ReadFile(filePath)
 	if err != nil {
-		Logger.Error("Enable to open file")
+		Logger.Error("Unable to open file")
 	}
 
 	return file
@@ -100,22 +98,4 @@ func CheckChange(oldYaml *Entity.Index, newYaml *Entity.Index) bool {
 
 func IsATGZFile(path string) bool {
 	return strings.HasSuffix(path, ".tgz")
-}
-
-// IsAChartPackage Check if in the zip has the requirement to be a Helm Chart (Chart.yaml)
-func IsAChartPackage(fileReader *tar.Reader) bool {
-	Logger.Debug("issou")
-	fmt.Println(fileReader)
-	for {
-		header, err := fileReader.Next()
-		if err == io.EOF {
-			break
-		}
-		if header.Typeflag == tar.TypeReg {
-			if header.Name == "Chart.yaml" || header.Name == "Chart.yml" {
-				return true
-			}
-		}
-	}
-	return false
 }
