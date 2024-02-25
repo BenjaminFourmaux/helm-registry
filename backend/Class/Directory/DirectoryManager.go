@@ -5,6 +5,7 @@ import (
 	"backend/Class/Database"
 	"backend/Class/Logger"
 	"backend/Entity"
+	"fmt"
 	"gopkg.in/yaml.v2"
 	"io"
 	"os"
@@ -103,6 +104,8 @@ func IsATGZFile(path string) bool {
 
 // IsAChartPackage Check if in the zip has the requirement to be a Helm Chart (Chart.yaml)
 func IsAChartPackage(fileReader *tar.Reader) bool {
+	Logger.Debug("issou")
+	fmt.Println(fileReader)
 	for {
 		header, err := fileReader.Next()
 		if err == io.EOF {
