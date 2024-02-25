@@ -8,12 +8,12 @@ import (
 	"backend/Class/Utils/env"
 	"backend/Entity"
 	"bytes"
+	"compress/gzip"
 	"fmt"
 	"github.com/fsnotify/fsnotify"
 	"gopkg.in/yaml.v2"
 	"io"
 	"os"
-	Filepath "path/filepath"
 )
 
 func RepositoryDirectoryWatcher() {
@@ -67,23 +67,25 @@ func ActionTrigger(event fsnotify.Event) {
 // InsertDBFromNewFile Send to BD info of a new chart creating in the repository directory
 func InsertDBFromNewFile(filepath string) {
 	// Open tar archive
-	archive, err := os.Open(filepath)
+	file, err := os.Open(Utils.ConvertWindowsPathToUnix(filepath))
 	if err != nil {
-		Logger.Error("Error impossible to open .tgz archive")
+		Logger.Error("Error unable to open .tgz archive")
 		return
 	}
-	fmt.Println(archive.Name())
 
-	//defer archive.Close()
+	// uncompressed file
+	uncompressedFile, err := gzip.NewReader(file)
+	if err != nil {
+		Logger.Error("Error uncompressed archive file")
+	}
 
 	// Create the archive reader
-	tarReader := tar.NewReader(archive)
-	fmt.Println(tarReader)
+	tarReader := tar.NewReader(uncompressedFile)
 
 	// Check if is a Helm Chart package
-	if !IsAChartPackage(tarReader) {
-		return
-	}
+	//if !IsAChartPackage(tarReader) {
+	//return
+	//}
 
 	// Browse archive
 	for {
@@ -106,7 +108,7 @@ func InsertDBFromNewFile(filepath string) {
 				}
 
 				// Create the DTO entity with the data from file
-				urls := Utils.GenerateChartUrls(Filepath.Base(Utils.ConvertWindowsPathToUnix(archive.Name())))
+				urls := Utils.GenerateChartUrls(Utils.GetFilenameFromPath(file.Name()))
 				var dto = Utils.ParserChartToDTO(dataFile, urls)
 
 				// Insert to the database
