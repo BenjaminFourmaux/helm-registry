@@ -111,7 +111,7 @@ func EndpointIndexYAML() {
 }
 
 func EndpointCharts() {
-	chartDir := env.REPOSITORY_DIR
+	chartDir := env.CHARTS_DIR
 	chartHandler := http.FileServer(http.Dir(chartDir))
 
 	http.HandleFunc("/charts/", func(w http.ResponseWriter, req *http.Request) {
