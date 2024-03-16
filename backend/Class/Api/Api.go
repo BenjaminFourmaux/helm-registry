@@ -113,7 +113,11 @@ func EndpointIndexYAML() {
 func EndpointCharts() {
 	chartDir := os.Getenv("REPOSITORY_DIR")
 	chartHandler := http.FileServer(http.Dir(chartDir))
-	http.Handle("/charts/", http.StripPrefix("/charts/", chartHandler))
+
+	http.HandleFunc("/charts/", func(w http.ResponseWriter, req *http.Request) {
+		traceRequest(req)
+		http.StripPrefix("/charts/", chartHandler)
+	})
 }
 
 // </editor-fold>
