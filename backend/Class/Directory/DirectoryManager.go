@@ -23,7 +23,7 @@ func UpdateIndex() {
 	// Step 1. Get registry info from Database
 	rows, errSql := Database.GetALlChartsOrderedByName()
 	if errSql != nil {
-		Logger.Error("Enable to get data from Database")
+		Logger.Error("Unable to get data from Database")
 	}
 
 	// Step 2. Build the file
@@ -81,7 +81,7 @@ func UpdateIndex() {
 func ReadFile(filePath string) []byte {
 	file, err := os.ReadFile(filePath)
 	if err != nil {
-		Logger.Error("Enable to open file")
+		Logger.Error("Unable to open file")
 	}
 
 	return file

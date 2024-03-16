@@ -56,7 +56,11 @@ func ActionTrigger(event fsnotify.Event) {
 	case "CREATE":
 		if IsATGZFile(event.Name) {
 			Logger.Info("Action - insert")
+
 			InsertDBFromNewFile(event.Name)
+
+			// Update index.yaml file after action triggering and database change
+			UpdateIndex()
 		}
 	case "REMOVE":
 		if IsATGZFile(event.Name) {
@@ -110,7 +114,7 @@ func InsertDBFromNewFile(filepath string) {
 				var dataFile Entity.ChartFile
 				err := yaml.Unmarshal(buf.Bytes(), &dataFile)
 				if err != nil {
-					Logger.Error("Error in the YAML file, unable to deserialize")
+					Logger.Error("Error in the YAML file, unable to deserialize it")
 				}
 
 				// Create the DTO entity with the data from file
@@ -128,7 +132,7 @@ func InsertDBFromNewFile(filepath string) {
 // DeleteDBFromRemoveFile Delete on the DB when a .tar file is removed
 func DeleteDBFromRemoveFile(filepath string) {
 	result := Database.GetChartByFilename(Utils.GetFilenameFromPath(filepath))
-	
+
 	fmt.Println(result)
 
 	if result.Err() != nil {
