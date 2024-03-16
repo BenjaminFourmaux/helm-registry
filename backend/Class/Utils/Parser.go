@@ -30,18 +30,18 @@ func ParserRowToChartDTO(row *sql.Row) Entity.ChartDTO {
 
 	var dto Entity.ChartDTO
 	err := row.Scan(
-		dto.Id,
-		dto.Name,
-		dto.Description,
-		dto.Version,
-		dto.Created,
-		dto.Digest,
-		dto.Home,
-		dto.Sources,
-		dto.Urls,
+		&dto.Id,
+		&dto.Name,
+		&dto.Description,
+		&dto.Version,
+		&dto.Created,
+		&dto.Digest,
+		&dto.Home,
+		&dto.Sources,
+		&dto.Urls,
 	)
 	if err != nil {
-		Logger.Error("eroor")
+		Logger.Error("To parse SQL row in a DTO object")
 		Logger.Raise(err.Error())
 	}
 

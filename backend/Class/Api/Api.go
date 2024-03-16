@@ -4,6 +4,7 @@ import (
 	"backend/Class/Database"
 	"backend/Class/Directory"
 	"backend/Class/Logger"
+	"backend/Class/Utils"
 	"backend/Entity"
 	"bytes"
 	"fmt"
@@ -67,6 +68,18 @@ func EndpointRoot() {
 func EndpointTest() {
 	http.HandleFunc("/test", func(w http.ResponseWriter, req *http.Request) {
 		traceRequest(req)
+
+		var filename = Utils.GetFilenameFromPath("./charts/test-nginx-1.0.0.tgz")
+		Logger.Debug(filename)
+
+		chartId := Database.GetChartByFilename(filename)
+		var chartToDelete = Utils.ParserRowToChartDTO(chartId)
+		fmt.Println(chartToDelete.Id)
+
+		_, err := Database.DeleteChart(chartToDelete.Id)
+		if err != nil {
+			Logger.Raise(err.Error())
+		}
 
 		io.WriteString(w, "Hello, Test !\n")
 	})
