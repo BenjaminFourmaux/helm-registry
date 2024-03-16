@@ -16,8 +16,9 @@ func InsertChart(entity ChartDTO) {
 		);
 	`
 
-	_, err := DB.Exec(sql, entity.Name, entity.Description, entity.Version, entity.Created, entity.Digest, entity.Home, entity.Urls)
+	_, err := DB.Exec(sql, entity.Name, entity.Description, entity.Version, entity.Created, entity.Digest, entity.Home, entity.Sources, entity.Urls)
 	if err != nil {
 		Logger.Error("Unable to insert in table 'charts'")
+		Logger.Raise(err.Error())
 	}
 }

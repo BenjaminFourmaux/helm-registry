@@ -14,6 +14,7 @@ import (
 	"gopkg.in/yaml.v2"
 	"io"
 	"os"
+	"strconv"
 )
 
 func RepositoryDirectoryWatcher() {
@@ -35,7 +36,7 @@ func RepositoryDirectoryWatcher() {
 				if !ok {
 					return
 				}
-				Logger.Info("Event trigger - " + event.Op.String() + " on" + event.Name)
+				Logger.Info("Event trigger - " + event.Op.String() + " on " + event.Name)
 
 				ActionTrigger(event)
 
@@ -58,7 +59,10 @@ func ActionTrigger(event fsnotify.Event) {
 			InsertDBFromNewFile(event.Name)
 		}
 	case "REMOVE":
-		Logger.Info("Action - delete")
+		if IsATGZFile(event.Name) {
+			Logger.Info("Action - delete")
+			DeleteDBFromRemoveFile(event.Name)
+		}
 	}
 	// Update index.yaml file after action triggering and database change
 	UpdateIndex()
@@ -72,6 +76,8 @@ func InsertDBFromNewFile(filepath string) {
 		Logger.Error("Error unable to open .tgz archive")
 		return
 	}
+
+	defer file.Close()
 
 	// uncompressed file
 	uncompressedFile, err := gzip.NewReader(file)
@@ -94,7 +100,7 @@ func InsertDBFromNewFile(filepath string) {
 			break
 		}
 		if header.Typeflag == tar.TypeReg {
-			if header.Name == "Chart.yaml" || header.Name == "Chart.yml" {
+			if Utils.GetFilenameFromPath(header.Name) == "Chart.yaml" || Utils.GetFilenameFromPath(header.Name) == "Chart.yml" {
 				// Read the content of the file and unmarshal it in yaml format
 				var buf bytes.Buffer
 				if _, err := io.Copy(&buf, tarReader); err != nil {
@@ -115,6 +121,26 @@ func InsertDBFromNewFile(filepath string) {
 				Database.InsertChart(dto)
 				break
 			}
+		}
+	}
+}
+
+// DeleteDBFromRemoveFile Delete on the DB when a .tar file is removed
+func DeleteDBFromRemoveFile(filepath string) {
+	result := Database.GetChartByFilename(Utils.GetFilenameFromPath(filepath))
+	
+	fmt.Println(result)
+
+	if result.Err() != nil {
+		Logger.Warning(result.Err().Error())
+	} else {
+		var chartToDelete = Utils.ParserRowToChartDTO(result)
+
+		Logger.Info("Delete Chart id: " + strconv.Itoa(chartToDelete.Id))
+
+		_, err := Database.DeleteChart(chartToDelete.Id)
+		if err != nil {
+			Logger.Error("Unable to delete Chart by id: " + strconv.Itoa(chartToDelete.Id))
 		}
 	}
 }

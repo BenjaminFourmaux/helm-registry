@@ -4,6 +4,7 @@ import (
 	"archive/tar"
 	"backend/Class/Database"
 	"backend/Class/Logger"
+	"backend/Class/Utils/env"
 	"backend/Entity"
 	"fmt"
 	"gopkg.in/yaml.v2"
@@ -15,7 +16,9 @@ import (
 )
 
 func UpdateIndex() {
-	filePath := os.Getenv("INDEX_FILE_PATH")
+	filePath := env.INDEX_FILE_PATH
+
+	Logger.Info("Updating Index")
 
 	// Step 1. Get registry info from Database
 	rows, errSql := Database.GetALlChartsOrderedByName()
@@ -59,7 +62,7 @@ func UpdateIndex() {
 	yamlFile := &Entity.Index{}
 	err := yaml.Unmarshal(ReadFile(filePath), yamlFile)
 	if err != nil {
-		Logger.Error("Impossible to unmarshal the index file")
+		Logger.Error("Unable to unmarshal the index file")
 	}
 
 	if CheckChange(yamlFile, &index) {
@@ -69,7 +72,9 @@ func UpdateIndex() {
 		// Step 5. Save index YAML file
 		SaveFile(filePath, yamlData)
 
-		Logger.Success("Index YAML file successfully updated")
+		Logger.Success("Index successfully updated")
+	} else {
+		Logger.Info("Index - No change needed")
 	}
 }
 
@@ -104,7 +109,6 @@ func IsATGZFile(path string) bool {
 
 // IsAChartPackage Check if in the zip has the requirement to be a Helm Chart (Chart.yaml)
 func IsAChartPackage(fileReader *tar.Reader) bool {
-	Logger.Debug("issou")
 	fmt.Println(fileReader)
 	for {
 		header, err := fileReader.Next()
