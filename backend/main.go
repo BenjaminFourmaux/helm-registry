@@ -39,6 +39,7 @@ func main() {
 	Logger.Info("Registering HTTP Endpoints")
 	Api.EndpointRoot()
 	Api.EndpointTest()
+	Api.EndpointHelpRedirect()
 	Api.EndpointIndexYAML()
 	Api.EndpointCharts()
 

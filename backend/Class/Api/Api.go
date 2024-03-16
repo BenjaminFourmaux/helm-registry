@@ -30,6 +30,32 @@ func StartServer() {
 
 // <editor-fold desc="Endpoints"> Endpoints
 
+func EndpointTest() {
+	http.HandleFunc("/test", func(w http.ResponseWriter, req *http.Request) {
+		traceRequest(req)
+
+		var filename = Utils.GetFilenameFromPath("./charts/test-nginx-1.0.0.tgz")
+		Logger.Debug(filename)
+
+		chartId := Database.GetChartByFilename(filename)
+		var chartToDelete = Utils.ParserRowToChartDTO(chartId)
+		fmt.Println(chartToDelete.Id)
+
+		_, err := Database.DeleteChart(chartToDelete.Id)
+		if err != nil {
+			Logger.Raise(err.Error())
+		}
+
+		io.WriteString(w, "Hello, Test !\n")
+	})
+}
+
+func EndpointHelpRedirect() {
+	http.HandleFunc("/help", func(w http.ResponseWriter, req *http.Request) {
+		http.Redirect(w, req, "https://helm.sh/docs/helm/helm_repo/", http.StatusSeeOther)
+	})
+}
+
 func EndpointRoot() {
 	http.HandleFunc("/", func(w http.ResponseWriter, req *http.Request) {
 		traceRequest(req)
@@ -62,26 +88,6 @@ func EndpointRoot() {
 		if err != nil {
 			http.Error(w, fmt.Sprintf("Error %s", err), http.StatusInternalServerError)
 		}
-	})
-}
-
-func EndpointTest() {
-	http.HandleFunc("/test", func(w http.ResponseWriter, req *http.Request) {
-		traceRequest(req)
-
-		var filename = Utils.GetFilenameFromPath("./charts/test-nginx-1.0.0.tgz")
-		Logger.Debug(filename)
-
-		chartId := Database.GetChartByFilename(filename)
-		var chartToDelete = Utils.ParserRowToChartDTO(chartId)
-		fmt.Println(chartToDelete.Id)
-
-		_, err := Database.DeleteChart(chartToDelete.Id)
-		if err != nil {
-			Logger.Raise(err.Error())
-		}
-
-		io.WriteString(w, "Hello, Test !\n")
 	})
 }
 
