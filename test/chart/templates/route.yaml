@@ -1,0 +1,15 @@
+kind: Route
+apiVersion: route.openshift.io/v1
+metadata:
+  name: route-nginx
+  namespace: {{ .Values.Namespace }}
+spec:
+  to:
+    kind: Service
+    name: nginx-service
+    weight: 100
+  port:
+    targetPort: 80
+  tls:
+    termination: passthrough
+    insecureEdgeTerminationPolicy: Redirect

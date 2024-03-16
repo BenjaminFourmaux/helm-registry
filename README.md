@@ -19,14 +19,15 @@ These parts are Docker images, that you use and deploy him in Docker env.
 ### Environment Variables
 It exists some environment variables to customize the registry.
 
-| Var | Description                                                         |
-| :-- |:--------------------------------------------------------------------|
-| `REGISTRY_NAME` | Name of the registry                                                |
-| `REGISTRY_DESCRIPTION` | A description of the registry                                       |
-| `REGISTRY_VERSION` | Version of the registry                                             |
-| `REGISTRY_MAINTAINER` | Name of the registry maintainer. Can be a person or an organisation |
-| `REGISTRY_MAINTAINER_URL` | URL of the website or email address of the registry maintainer      |
-| `REGISTRY_LABELS` | List (separed by ';') of labels. E.g : `env:prod;project:test`      |
+| Variable                  | Description                                                                                                                          |
+|:--------------------------|:-------------------------------------------------------------------------------------------------------------------------------------|
+| `REGISTRY_NAME`           | Name of the registry                                                                                                                 |
+| `REGISTRY_DESCRIPTION`    | A description of the registry                                                                                                        |
+| `REGISTRY_VERSION`        | Version of the registry                                                                                                              |
+| `REGISTRY_MAINTAINER`     | Name of the registry maintainer. Can be a person or an organisation                                                                  |
+| `REGISTRY_MAINTAINER_URL` | URL of the website or email address of the registry maintainer                                                                       |
+| `REGISTRY_LABELS`         | List (separated by ';') of labels. E.g : `env:prod;project:test`                                                                     |
+| `REPOSITORY_DIR`          | Path of charts location. By default : for Docker `/usr/helm-registry/charts`, Windows `%USERPROFILE%\Documents\Helm-Registry\charts` |
 
 ## Version
 [![](https://badgen.net/github/tag/BenjaminFourmaux/helm-registry?cache=600)](https://github.com/BenjaminFourmauxhelm-registry/tags) [![](https://badgen.net/github/release/BenjaminFourmaux/helm-registry?cache=600)](https://github.com/BenjaminFourmaux/helm-registry/releases)

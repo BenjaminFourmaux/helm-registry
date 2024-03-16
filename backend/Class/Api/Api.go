@@ -4,13 +4,14 @@ import (
 	"backend/Class/Database"
 	"backend/Class/Directory"
 	"backend/Class/Logger"
+	"backend/Class/Utils"
+	"backend/Class/Utils/env"
 	"backend/Entity"
 	"bytes"
 	"fmt"
 	"gopkg.in/yaml.v2"
 	"io"
 	"net/http"
-	"os"
 	"strings"
 )
 
@@ -29,10 +30,36 @@ func StartServer() {
 
 // <editor-fold desc="Endpoints"> Endpoints
 
+func EndpointTest() {
+	http.HandleFunc("/test", func(w http.ResponseWriter, req *http.Request) {
+		traceRequest(req)
+
+		var filename = Utils.GetFilenameFromPath("./charts/test-nginx-1.0.0.tgz")
+		Logger.Debug(filename)
+
+		chartId := Database.GetChartByFilename(filename)
+		var chartToDelete = Utils.ParserRowToChartDTO(chartId)
+		fmt.Println(chartToDelete.Id)
+
+		_, err := Database.DeleteChart(chartToDelete.Id)
+		if err != nil {
+			Logger.Raise(err.Error())
+		}
+
+		io.WriteString(w, "Hello, Test !\n")
+	})
+}
+
+func EndpointHelpRedirect() {
+	http.HandleFunc("/help", func(w http.ResponseWriter, req *http.Request) {
+		http.Redirect(w, req, "https://helm.sh/docs/helm/helm_repo/", http.StatusSeeOther)
+	})
+}
+
 func EndpointRoot() {
 	http.HandleFunc("/", func(w http.ResponseWriter, req *http.Request) {
 		traceRequest(req)
-		var infoDTO Entity.DTOInfo
+		var infoDTO Entity.RegistryDTO
 
 		w.Header().Set("Content-Type", "text/yaml")
 
@@ -64,16 +91,8 @@ func EndpointRoot() {
 	})
 }
 
-func EndpointTest() {
-	http.HandleFunc("/test", func(w http.ResponseWriter, req *http.Request) {
-		traceRequest(req)
-
-		io.WriteString(w, "Hello, Test !\n")
-	})
-}
-
 func EndpointIndexYAML() {
-	indexFilePath := os.Getenv("INDEX_FILE_PATH")
+	indexFilePath := env.INDEX_FILE_PATH
 
 	http.HandleFunc("/index.yaml", func(w http.ResponseWriter, req *http.Request) {
 		traceRequest(req)
@@ -88,6 +107,16 @@ func EndpointIndexYAML() {
 		if err != nil {
 			http.Error(w, fmt.Sprintf("Error %s", err), http.StatusInternalServerError)
 		}
+	})
+}
+
+func EndpointCharts() {
+	chartDir := env.REPOSITORY_DIR
+	chartHandler := http.FileServer(http.Dir(chartDir))
+
+	http.HandleFunc("/charts/", func(w http.ResponseWriter, req *http.Request) {
+		traceRequest(req)
+		http.StripPrefix("/charts/", chartHandler)
 	})
 }
 

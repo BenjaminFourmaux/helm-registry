@@ -5,29 +5,32 @@ import (
 	"backend/Class/Database"
 	"backend/Class/Directory"
 	"backend/Class/Logger"
+	"backend/Class/Utils/env"
 	_ "github.com/mattn/go-sqlite3"
-	"os"
 )
 
 func main() {
 	Logger.Info("Helm Registry - Started")
 
-	// Get env var
-	os.Setenv("INDEX_FILE_PATH", "index.yaml")
+	// Setup env
+	env.SetupEnv()
 
 	// Database
 	Database.OpenConnection("sqlite3", "./charts_info.db")
-	Database.CreateTableInfo()
+	Database.CreateTableCharts()
 	Database.CreateTableRegistry()
 	Database.InitInfo(
-		os.Getenv("REGISTRY_NAME"),
-		os.Getenv("REGISTRY_DESCRIPTION"),
-		os.Getenv("REGISTRY_VERSION"),
-		os.Getenv("REGISTRY_MAINTAINER"),
-		os.Getenv("REGISTRY_MAINTAINER_URL"),
-		os.Getenv("REGISTRY_LABELS"),
+		env.REGISTRY_NAME,
+		env.REGISTRY_DESCRIPTION,
+		env.REGISTRY_VERSION,
+		env.REGISTRY_MAINTAINER,
+		env.REGISTRY_MAINTAINER_URL,
+		env.REGISTRY_LABELS,
 	)
 	//Database.Fixtures() // Insert test fixtures
+
+	// Charts discovery
+	Directory.RepositoryDirectoryWatcher()
 
 	// Update file
 	Directory.UpdateIndex()
@@ -36,9 +39,12 @@ func main() {
 	Logger.Info("Registering HTTP Endpoints")
 	Api.EndpointRoot()
 	Api.EndpointTest()
+	Api.EndpointHelpRedirect()
 	Api.EndpointIndexYAML()
+	Api.EndpointCharts()
 
 	// Start HTTP Server
 	Logger.Info("Start HTTP Server")
+	Logger.Separator()
 	Api.StartServer()
 }
