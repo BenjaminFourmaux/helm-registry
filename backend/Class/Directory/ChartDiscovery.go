@@ -133,8 +133,6 @@ func InsertDBFromNewFile(filepath string) {
 func DeleteDBFromRemoveFile(filepath string) {
 	result := Database.GetChartByFilename(Utils.GetFilenameFromPath(filepath))
 
-	fmt.Println(result)
-
 	if result.Err() != nil {
 		Logger.Warning(result.Err().Error())
 	} else {

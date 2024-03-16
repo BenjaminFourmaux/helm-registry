@@ -3,6 +3,7 @@ package env
 import (
 	"backend/Class/Logger"
 	"os"
+	"runtime"
 )
 
 // Using var instead of os.getEnv() for improve security against EnvVarInjection
@@ -29,11 +30,13 @@ func SetupEnv() {
 	}
 
 	if os.Getenv("REPOSITORY_DIR") == "" {
-		if isDocker {
+		if runtime.GOOS == "windows" {
+			userDocs := os.Getenv("USERPROFILE") + "\\Documents\\helm-registry\\charts"
+			_ = os.Setenv("REPOSITORY_DIR", userDocs)
+			//_ = os.Setenv("REPOSITORY_DIR", "../test/chart")
+
+		} else { // Linux and Docker platforms
 			_ = os.Setenv("REPOSITORY_DIR", "/usr/helm-registry/charts")
-		} else {
-			//userDocs := os.Getenv("USERPROFILE") + "\\Documents\\helm-registry\\charts"
-			_ = os.Setenv("REPOSITORY_DIR", "../test/chart") // TODO : remplace by userDocs
 		}
 	}
 

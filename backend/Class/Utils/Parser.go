@@ -4,7 +4,6 @@ import (
 	"backend/Class/Logger"
 	"backend/Entity"
 	"database/sql"
-	"fmt"
 	"strings"
 	"time"
 )
@@ -26,8 +25,6 @@ func ParserChartToDTO(entity Entity.ChartFile, urls []string) Entity.ChartDTO {
 
 // ParserRowToChartDTO Parse the result of an DB row into a ChartDTO
 func ParserRowToChartDTO(row *sql.Row) Entity.ChartDTO {
-	fmt.Println(row)
-
 	var dto Entity.ChartDTO
 	err := row.Scan(
 		&dto.Id,
