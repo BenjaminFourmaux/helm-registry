@@ -5,13 +5,13 @@ import (
 	"backend/Class/Directory"
 	"backend/Class/Logger"
 	"backend/Class/Utils"
+	"backend/Class/Utils/env"
 	"backend/Entity"
 	"bytes"
 	"fmt"
 	"gopkg.in/yaml.v2"
 	"io"
 	"net/http"
-	"os"
 	"strings"
 )
 
@@ -92,7 +92,7 @@ func EndpointRoot() {
 }
 
 func EndpointIndexYAML() {
-	indexFilePath := os.Getenv("INDEX_FILE_PATH")
+	indexFilePath := env.INDEX_FILE_PATH
 
 	http.HandleFunc("/index.yaml", func(w http.ResponseWriter, req *http.Request) {
 		traceRequest(req)
@@ -111,7 +111,7 @@ func EndpointIndexYAML() {
 }
 
 func EndpointCharts() {
-	chartDir := os.Getenv("REPOSITORY_DIR")
+	chartDir := env.REPOSITORY_DIR
 	chartHandler := http.FileServer(http.Dir(chartDir))
 
 	http.HandleFunc("/charts/", func(w http.ResponseWriter, req *http.Request) {
