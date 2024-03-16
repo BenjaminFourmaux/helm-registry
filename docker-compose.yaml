@@ -10,7 +10,7 @@ services:
     networks:
       - helm-net
     volumes:
-      - ./backend:/go/src/app
+      - ./test/chart/test-nginx-1.0.0.tgz:/usr/helm-registry/charts/test-nginx-1.0.0.tgz
 
   testcontainer:
     container_name: testcontainer

@@ -30,6 +30,7 @@ func main() {
 	//Database.Fixtures() // Insert test fixtures
 
 	// Charts discovery
+	Directory.Discovery()
 	Directory.RepositoryDirectoryWatcher()
 
 	// Update file

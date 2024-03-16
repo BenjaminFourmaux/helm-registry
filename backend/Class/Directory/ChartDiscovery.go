@@ -14,9 +14,77 @@ import (
 	"gopkg.in/yaml.v2"
 	"io"
 	"os"
+	"path/filepath"
 	"strconv"
 )
 
+// Discovery Browse all compressed file in the charts directory and check if all charts are in database.
+// Otherwise, add them
+func Discovery() {
+	files, err := os.ReadDir(env.CHARTS_DIR)
+	if err != nil {
+		Logger.Error("Unable to open Charts Directory")
+		Logger.Raise(err.Error())
+	}
+
+	for _, file := range files {
+		if !file.IsDir() && filepath.Ext(file.Name()) == ".tgz" {
+			// 1. Open .tgz archive
+			archive, err := os.Open(filepath.Join(env.CHARTS_DIR, file.Name()))
+			if err != nil {
+				Logger.Error("Unable to open tar archive")
+				Logger.Raise(err.Error())
+			}
+			defer archive.Close()
+
+			uncompressedFile, err := gzip.NewReader(archive)
+			tarReader := tar.NewReader(uncompressedFile)
+
+			// 2. Browse zip file content
+			for {
+				header, err := tarReader.Next()
+				if err == io.EOF {
+					break
+				}
+				if header.Typeflag == tar.TypeReg {
+					if IsChartFile(Utils.GetFilenameFromPath(header.Name)) {
+						// 3. Extract chart infos from chart YAML file
+						var buf bytes.Buffer
+						if _, err := io.Copy(&buf, tarReader); err != nil {
+							Logger.Error("Error when reading Chart.yaml file")
+							return
+						}
+						var dataFile Entity.ChartFile
+						err := yaml.Unmarshal(buf.Bytes(), &dataFile)
+						if err != nil {
+							Logger.Error("Error in the YAML file, unable to deserialize it")
+						}
+
+						// 4. Create the DTO entity with the data from file
+						urls := Utils.GenerateChartUrls(Utils.GetFilenameFromPath(file.Name()))
+						var dto = Utils.ParserChartToDTO(dataFile, urls)
+
+						// 5. Check if chart already exist in the database
+						if Database.IfChartExist(dto) {
+							// 6.a Update chart in db
+							var chartId = Utils.ParserRowToChartDTO(Database.GetChartByCriteria(dto)).Id
+							Database.UpdateChart(chartId, dto)
+
+						} else {
+							// 6.b Insert to the database
+							Database.InsertChart(dto)
+						}
+
+						break
+					}
+				}
+			}
+
+		}
+	}
+}
+
+// RepositoryDirectoryWatcher Initialize the Directory Watcher Listener and call appropriate functions when Events throw
 func RepositoryDirectoryWatcher() {
 	// Create a Watcher
 	watcher, err := fsnotify.NewWatcher()
@@ -25,7 +93,7 @@ func RepositoryDirectoryWatcher() {
 	}
 
 	// Add the watching folder
-	err = watcher.Add(env.REPOSITORY_DIR)
+	err = watcher.Add(env.CHARTS_DIR)
 
 	// Trigger event
 	go func() {
@@ -38,7 +106,7 @@ func RepositoryDirectoryWatcher() {
 				}
 				Logger.Info("Event trigger - " + event.Op.String() + " on " + event.Name)
 
-				ActionTrigger(event)
+				actionTrigger(event)
 
 			case err, ok := <-watcher.Errors:
 				if !ok {
@@ -50,14 +118,14 @@ func RepositoryDirectoryWatcher() {
 	}()
 }
 
-// ActionTrigger Chose an action by the event operation
-func ActionTrigger(event fsnotify.Event) {
+// actionTrigger Chose an action by the event operation
+func actionTrigger(event fsnotify.Event) {
 	switch event.Op.String() {
 	case "CREATE":
 		if IsATGZFile(event.Name) {
 			Logger.Info("Action - insert")
 
-			InsertDBFromNewFile(event.Name)
+			insertDBFromNewFile(event.Name)
 
 			// Update index.yaml file after action triggering and database change
 			UpdateIndex()
@@ -65,15 +133,15 @@ func ActionTrigger(event fsnotify.Event) {
 	case "REMOVE":
 		if IsATGZFile(event.Name) {
 			Logger.Info("Action - delete")
-			DeleteDBFromRemoveFile(event.Name)
+			deleteDBFromRemoveFile(event.Name)
 		}
 	}
 	// Update index.yaml file after action triggering and database change
 	UpdateIndex()
 }
 
-// InsertDBFromNewFile Send to BD info of a new chart creating in the repository directory
-func InsertDBFromNewFile(filepath string) {
+// insertDBFromNewFile Send to BD info of a new chart creating in the repository directory
+func insertDBFromNewFile(filepath string) {
 	// Open tar archive
 	file, err := os.Open(Utils.ConvertWindowsPathToUnix(filepath))
 	if err != nil {
@@ -104,7 +172,7 @@ func InsertDBFromNewFile(filepath string) {
 			break
 		}
 		if header.Typeflag == tar.TypeReg {
-			if Utils.GetFilenameFromPath(header.Name) == "Chart.yaml" || Utils.GetFilenameFromPath(header.Name) == "Chart.yml" {
+			if IsChartFile(Utils.GetFilenameFromPath(header.Name)) {
 				// Read the content of the file and unmarshal it in yaml format
 				var buf bytes.Buffer
 				if _, err := io.Copy(&buf, tarReader); err != nil {
@@ -129,8 +197,8 @@ func InsertDBFromNewFile(filepath string) {
 	}
 }
 
-// DeleteDBFromRemoveFile Delete on the DB when a .tar file is removed
-func DeleteDBFromRemoveFile(filepath string) {
+// deleteDBFromRemoveFile Delete on the DB when a .tar file is removed
+func deleteDBFromRemoveFile(filepath string) {
 	result := Database.GetChartByFilename(Utils.GetFilenameFromPath(filepath))
 
 	if result.Err() != nil {

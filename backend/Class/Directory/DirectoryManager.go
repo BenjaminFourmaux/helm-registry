@@ -123,3 +123,8 @@ func IsAChartPackage(fileReader *tar.Reader) bool {
 	}
 	return false
 }
+
+// IsChartFile Return true if the filename match with Helm chart file naming rule
+func IsChartFile(filename string) bool {
+	return filename == "Chart.yaml" || filename == "Chart.yml" || filename == "chart.yaml" || filename == "chart.yml"
+}
