@@ -11,7 +11,7 @@ import (
 var (
 	IS_DOCKER               bool   // IS_DOCKER Env var - True if on Docker env, False if is on Windows or Linux
 	INDEX_FILE_PATH         string // INDEX_FILE_PATH Env var - Path to the index.yaml file
-	REPOSITORY_DIR          string // REPOSITORY_DIR Env var - Path to the repository folder
+	CHARTS_DIR              string // REPOSITORY_DIR Env var - Path to the charts folder
 	REGISTRY_NAME           string // REGISTRY_NAME Env var - Name of this registry
 	REGISTRY_DESCRIPTION    string // REGISTRY_DESCRIPTION Env var - Description of this registry
 	REGISTRY_VERSION        string // REGISTRY_VERSION Env var - Version of this registry
@@ -29,21 +29,21 @@ func SetupEnv() {
 		_ = os.Setenv("INDEX_FILE_PATH", "index.yaml")
 	}
 
-	if os.Getenv("REPOSITORY_DIR") == "" {
+	if os.Getenv("CHARTS_DIR") == "" {
 		if runtime.GOOS == "windows" {
 			userDocs := os.Getenv("USERPROFILE") + "\\Documents\\helm-registry\\charts"
-			_ = os.Setenv("REPOSITORY_DIR", userDocs)
-			//_ = os.Setenv("REPOSITORY_DIR", "../test/chart")
+			_ = os.Setenv("CHARTS_DIR", userDocs)
+			//_ = os.Setenv("CHARTS_DIR", "../test/chart")
 
 		} else { // Linux and Docker platforms
-			_ = os.Setenv("REPOSITORY_DIR", "/usr/helm-registry/charts")
+			_ = os.Setenv("CHARTS_DIR", "/usr/helm-registry/charts")
 		}
 	}
 
 	// Save env var change after permutation in class properties
 	IS_DOCKER = isDocker
 	INDEX_FILE_PATH = os.Getenv("INDEX_FILE_PATH")
-	REPOSITORY_DIR = os.Getenv("REPOSITORY_DIR")
+	CHARTS_DIR = os.Getenv("CHARTS_DIR")
 	REGISTRY_NAME = os.Getenv("REGISTRY_NAME")
 	REGISTRY_DESCRIPTION = os.Getenv("REGISTRY_DESCRIPTION")
 	REGISTRY_VERSION = os.Getenv("REGISTRY_VERSION")
@@ -53,13 +53,13 @@ func SetupEnv() {
 
 	// Create directories
 
-	// if REPOSITORY_DIR not exist, create it
-	if _, err := os.Stat(REPOSITORY_DIR); os.IsNotExist(err) {
-		err := os.MkdirAll(REPOSITORY_DIR, 0755)
+	// if CHARTS_DIR not exist, create it
+	if _, err := os.Stat(CHARTS_DIR); os.IsNotExist(err) {
+		err := os.MkdirAll(CHARTS_DIR, 0755)
 		if err != nil {
-			Logger.Error("Error creating directory : " + REPOSITORY_DIR)
+			Logger.Error("Error creating directory : " + CHARTS_DIR)
 		} else {
-			Logger.Success("Creating REPOSITORY_DIR on : " + REPOSITORY_DIR)
+			Logger.Success("Creating CHARTS_DIR on : " + CHARTS_DIR)
 		}
 	}
 }
