@@ -16,7 +16,7 @@ func main() {
 	env.SetupEnv()
 
 	// Database
-	Database.OpenConnection("sqlite3", "./charts_info.db")
+	Database.OpenConnection("sqlite3", "./registry.db")
 	Database.CreateTableCharts()
 	Database.CreateTableRegistry()
 	Database.InitInfo(
@@ -30,6 +30,7 @@ func main() {
 	//Database.Fixtures() // Insert test fixtures
 
 	// Charts discovery
+	Directory.Discovery()
 	Directory.RepositoryDirectoryWatcher()
 
 	// Update file

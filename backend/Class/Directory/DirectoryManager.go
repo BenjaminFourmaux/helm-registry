@@ -4,12 +4,14 @@ import (
 	"archive/tar"
 	"backend/Class/Database"
 	"backend/Class/Logger"
+	"backend/Class/Utils"
 	"backend/Class/Utils/env"
 	"backend/Entity"
 	"fmt"
 	"gopkg.in/yaml.v2"
 	"io"
 	"os"
+	"path/filepath"
 	"reflect"
 	"strings"
 	"time"
@@ -34,6 +36,7 @@ func UpdateIndex() {
 	}
 
 	// Step 3. Foreach rows
+	// TODO: refactor to use a PARSER from Utils
 	for rows.Next() {
 		var entry Entity.ChartDTO
 
@@ -47,10 +50,10 @@ func UpdateIndex() {
 			Version:     entry.Version,
 			Created:     entry.Created,
 			Name:        entry.Name,
-			Description: entry.Description,
+			Description: Utils.NullToString(entry.Description),
 			Digest:      entry.Digest,
-			Home:        entry.Home,
-			Sources:     strings.Split(entry.Sources, ";"),
+			Home:        Utils.NullToString(entry.Home),
+			Sources:     strings.Split(Utils.NullToString(entry.Sources), ";"),
 			Urls:        strings.Split(entry.Urls, ";"),
 		}
 
@@ -103,8 +106,9 @@ func CheckChange(oldYaml *Entity.Index, newYaml *Entity.Index) bool {
 	return !reflect.DeepEqual(*oldYaml, *newYaml)
 }
 
-func IsATGZFile(path string) bool {
-	return strings.HasSuffix(path, ".tgz")
+// IsTGZArchive Return true if the file (or path+file) extension is .tgz
+func IsTGZArchive(path string) bool {
+	return filepath.Ext(path) == ".tgz"
 }
 
 // IsAChartPackage Check if in the zip has the requirement to be a Helm Chart (Chart.yaml)
@@ -119,6 +123,21 @@ func IsAChartPackage(fileReader *tar.Reader) bool {
 			if header.Name == "Chart.yaml" || header.Name == "Chart.yml" {
 				return true
 			}
+		}
+	}
+	return false
+}
+
+// IsChartFile Return true if the filename match with Helm chart file naming rule
+func IsChartFile(filename string) bool {
+	return filename == "Chart.yaml" || filename == "Chart.yml" || filename == "chart.yaml" || filename == "chart.yml"
+}
+
+// IsFilenameInDirectoryFiles Return true if the filename is on the directory (list of present filename)
+func IsFilenameInDirectoryFiles(filename string, list []string) bool {
+	for _, item := range list {
+		if item == filename {
+			return true
 		}
 	}
 	return false
