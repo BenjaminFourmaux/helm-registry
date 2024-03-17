@@ -186,7 +186,7 @@ func checkRemovedChartFile(files []os.DirEntry) {
 	}
 
 	// 6. Delete removed chart
-	_, err := Database.DeleteCharts(chartsIdToDelete)
+	err := Database.DeleteCharts(chartsIdToDelete)
 	if err != nil {
 		Logger.Error("When deleted removed charts")
 		Logger.Raise(err.Error())

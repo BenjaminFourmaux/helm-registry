@@ -2,8 +2,6 @@ package Database
 
 import (
 	"database/sql"
-	"strconv"
-	"strings"
 )
 
 func DeleteChart(id int) (sql.Result, error) {
@@ -11,12 +9,25 @@ func DeleteChart(id int) (sql.Result, error) {
 }
 
 // DeleteCharts Delete all charts via id passed in list parameter
-func DeleteCharts(ids []int) (sql.Result, error) {
-	var strList []string
+func DeleteCharts(ids []int) error {
+	var err error
+
+	// This method doesn't work
+	/*var strList []string
 	for _, v := range ids {
 		strList = append(strList, strconv.Itoa(v))
 	}
-	param := strings.Join(strList, ",")
+	param := strings.Join(strList, ", ")
 
-	return DB.Exec(`DELETE FROM charts WHERE id IN (?)`, param)
+	return DB.Exec(`DELETE FROM charts WHERE id IN ($1)`, param)*/
+
+	for _, id := range ids {
+		_, errTmp := DB.Exec(`DELETE FROM charts WHERE id IN ($1)`, id)
+
+		if errTmp != nil {
+			err = errTmp
+		}
+	}
+
+	return err
 }
