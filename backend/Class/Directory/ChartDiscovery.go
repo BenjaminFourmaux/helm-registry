@@ -21,6 +21,8 @@ import (
 // Discovery Browse all compressed file in the charts directory and check if all charts are in database.
 // Otherwise, add them
 func Discovery() {
+	Logger.Info("Discovering charts")
+
 	files, err := os.ReadDir(env.CHARTS_DIR)
 	if err != nil {
 		Logger.Error("Unable to open Charts Directory")

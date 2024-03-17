@@ -3,6 +3,7 @@ package Database
 import (
 	"backend/Entity"
 	"database/sql"
+	"errors"
 	"fmt"
 )
 
@@ -32,5 +33,10 @@ func GetChartByCriteria(chart Entity.ChartDTO) *sql.Row {
 
 func IfChartExist(chart Entity.ChartDTO) bool {
 	var result = GetChartByCriteria(chart)
-	return result != nil
+	var id int
+	err := result.Scan(&id)
+	if errors.Is(err, sql.ErrNoRows) {
+		return false
+	}
+	return true
 }
