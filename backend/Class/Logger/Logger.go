@@ -1,6 +1,9 @@
 package Logger
 
-import "time"
+import (
+	"fmt"
+	"time"
+)
 
 var introducer = " > "
 var separator = " | "
@@ -10,8 +13,10 @@ func getCurrentDatetime() string {
 	return currentDatetime.Format("15:04:05 02-01-2006")
 }
 
-func Write(message string) {
-	println(message)
+func Write(args ...any) {
+	for _, arg := range args {
+		fmt.Println(arg)
+	}
 }
 
 func Debug(message string) {
