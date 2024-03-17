@@ -1,19 +1,20 @@
 package Entity
 
 import (
+	"database/sql"
 	"time"
 )
 
 type ChartDTO struct {
-	Id          int       `json:"id"`
-	Name        string    `json:"name"`
-	Description string    `json:"description"`
-	Version     string    `json:"version"`
-	Created     time.Time `json:"created"`
-	Digest      string    `json:"digest"`
-	Home        string    `json:"home"`
-	Sources     string    `json:"sources"`
-	Urls        string    `json:"urls"`
+	Id          int            `json:"id"`
+	Name        string         `json:"name"`
+	Description sql.NullString `json:"description"` // nullable string field
+	Version     string         `json:"version"`
+	Created     time.Time      `json:"created"`
+	Digest      string         `json:"digest"`
+	Home        sql.NullString `json:"home"`    // nullable string field
+	Sources     sql.NullString `json:"sources"` // nullable string field
+	Urls        string         `json:"urls"`
 }
 
 type RegistryDTO struct {

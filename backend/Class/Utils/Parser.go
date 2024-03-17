@@ -12,18 +12,46 @@ import (
 func ParserChartToDTO(entity Entity.ChartFile, urls []string) Entity.ChartDTO {
 	var dto = Entity.ChartDTO{
 		Name:        entity.Name,
-		Description: entity.Description,
+		Description: StringToNull(entity.Description),
 		Version:     entity.Version,
 		Created:     time.Now(),
 		Digest:      "", // TODO : Compute manually the hash via sha-256 algorithm
-		Home:        entity.Home,
-		Sources:     strings.Join(entity.Sources, ";"),
+		Home:        StringToNull(entity.Home),
+		Sources:     StringToNull(strings.Join(entity.Sources, ";")),
 		Urls:        strings.Join(urls, ";"),
 	}
 	return dto
 }
 
-// ParserRowToChartDTO Parse the result of an DB row into a ChartDTO
+// ParserRowsToChartDTO Parse the result of a DB rows (multiple row result) in a list of ChartDTO
+func ParserRowsToChartDTO(rows *sql.Rows) []Entity.ChartDTO {
+	var list []Entity.ChartDTO
+	for rows.Next() {
+		var dto Entity.ChartDTO
+		err := rows.Scan(
+			&dto.Id,
+			&dto.Name,
+			&dto.Description,
+			&dto.Version,
+			&dto.Created,
+			&dto.Digest,
+			&dto.Home,
+			&dto.Sources,
+			&dto.Urls,
+		)
+
+		if err != nil {
+			Logger.Error("To parse SQL row in a DTO object")
+			Logger.Raise(err.Error())
+		}
+
+		list = append(list, dto)
+	}
+
+	return list
+}
+
+// ParserRowToChartDTO Parse the result of a DB row into a ChartDTO
 func ParserRowToChartDTO(row *sql.Row) Entity.ChartDTO {
 	var dto Entity.ChartDTO
 	err := row.Scan(
@@ -37,10 +65,29 @@ func ParserRowToChartDTO(row *sql.Row) Entity.ChartDTO {
 		&dto.Sources,
 		&dto.Urls,
 	)
+
 	if err != nil {
 		Logger.Error("To parse SQL row in a DTO object")
 		Logger.Raise(err.Error())
 	}
 
 	return dto
+}
+
+// NullToString Convert a sql.NullString into a string (same empty)
+func NullToString(nullString sql.NullString) string {
+	if nullString.Valid {
+		return nullString.String
+	} else {
+		return ""
+	}
+}
+
+// StringToNull Convert a string to a sql.NullString
+func StringToNull(str string) sql.NullString {
+	if str == "" {
+		return sql.NullString{}
+	} else {
+		return sql.NullString{String: str}
+	}
 }

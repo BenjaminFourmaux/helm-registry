@@ -16,6 +16,7 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
+	"strings"
 )
 
 // Discovery Browse all compressed file in the charts directory and check if all charts are in database.
@@ -29,9 +30,14 @@ func Discovery() {
 		Logger.Raise(err.Error())
 	}
 
+	// 1. Check for deleted chart file
+	checkRemovedChartFile(files)
+
+	Logger.Info("Discovering charts - Check for new/updated chart")
+
 	for _, file := range files {
-		if !file.IsDir() && filepath.Ext(file.Name()) == ".tgz" {
-			// 1. Open .tgz archive
+		if !file.IsDir() && IsTGZArchive(file.Name()) {
+			// 2. Open .tgz archive
 			archive, err := os.Open(filepath.Join(env.CHARTS_DIR, file.Name()))
 			if err != nil {
 				Logger.Error("Unable to open tar archive")
@@ -42,7 +48,7 @@ func Discovery() {
 			uncompressedFile, err := gzip.NewReader(archive)
 			tarReader := tar.NewReader(uncompressedFile)
 
-			// 2. Browse zip file content
+			// 3. Browse zip file content
 			for {
 				header, err := tarReader.Next()
 				if err == io.EOF {
@@ -50,7 +56,7 @@ func Discovery() {
 				}
 				if header.Typeflag == tar.TypeReg {
 					if IsChartFile(Utils.GetFilenameFromPath(header.Name)) {
-						// 3. Extract chart infos from chart YAML file
+						// 4. Extract chart infos from chart YAML file
 						var buf bytes.Buffer
 						if _, err := io.Copy(&buf, tarReader); err != nil {
 							Logger.Error("Error when reading Chart.yaml file")
@@ -62,18 +68,18 @@ func Discovery() {
 							Logger.Error("Error in the YAML file, unable to deserialize it")
 						}
 
-						// 4. Create the DTO entity with the data from file
+						// 5. Create the DTO entity with the data from file
 						urls := Utils.GenerateChartUrls(Utils.GetFilenameFromPath(file.Name()))
 						var dto = Utils.ParserChartToDTO(dataFile, urls)
 
-						// 5. Check if chart already exist in the database
+						// 6. Check if chart already exist in the database
 						if Database.IfChartExist(dto) {
-							// 6.a Update chart in db
+							// 7.a Update chart in db
 							var chartId = Utils.ParserRowToChartDTO(Database.GetChartByCriteria(dto)).Id
 							Database.UpdateChart(chartId, dto)
 
 						} else {
-							// 6.b Insert to the database
+							// 7.b Insert to the database
 							Database.InsertChart(dto)
 						}
 
@@ -124,7 +130,7 @@ func RepositoryDirectoryWatcher() {
 func actionTrigger(event fsnotify.Event) {
 	switch event.Op.String() {
 	case "CREATE":
-		if IsATGZFile(event.Name) {
+		if IsTGZArchive(event.Name) {
 			Logger.Info("Action - insert")
 
 			insertDBFromNewFile(event.Name)
@@ -133,13 +139,58 @@ func actionTrigger(event fsnotify.Event) {
 			UpdateIndex()
 		}
 	case "REMOVE":
-		if IsATGZFile(event.Name) {
+		if IsTGZArchive(event.Name) {
 			Logger.Info("Action - delete")
 			deleteDBFromRemoveFile(event.Name)
 		}
 	}
 	// Update index.yaml file after action triggering and database change
 	UpdateIndex()
+}
+
+// checkRemovedChartFile Browse all files of the charts directory, get only .tgz file and add them into a list of file
+// name and check if in the db, all charts entry has equivalent in directory. Otherwise, delete him
+func checkRemovedChartFile(files []os.DirEntry) {
+	Logger.Info("Discovering charts - Check for removed chart files")
+
+	var filenames []string
+	var chartsIdToDelete []int
+
+	// 1. Browse all files in directory and add them to a list of file present
+	for _, file := range files {
+		if !file.IsDir() && IsTGZArchive(file.Name()) {
+			filenames = append(filenames, file.Name())
+		}
+	}
+
+	// 2. Get all charts in db
+	chartsInDB, _ := Database.GetAllCharts()
+	listALlChartsDTO := Utils.ParserRowsToChartDTO(chartsInDB)
+
+	// 3. Browse all charts in db and get chart id not in directory
+	for _, chart := range listALlChartsDTO {
+		var isOnDirectory = false
+		var listUrls = strings.Split(chart.Urls, ";")
+
+		// 4. Browse chart's urls
+		for _, url := range listUrls {
+			if IsFilenameInDirectoryFiles(filepath.Base(url), filenames) {
+				isOnDirectory = true
+			}
+		}
+
+		// 5. Add id of chart if not in directory (a deleted file chart)
+		if !isOnDirectory {
+			chartsIdToDelete = append(chartsIdToDelete, chart.Id)
+		}
+	}
+
+	// 6. Delete removed chart
+	_, err := Database.DeleteCharts(chartsIdToDelete)
+	if err != nil {
+		Logger.Error("When deleted removed charts")
+		Logger.Raise(err.Error())
+	}
 }
 
 // insertDBFromNewFile Send to BD info of a new chart creating in the repository directory

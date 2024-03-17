@@ -7,12 +7,14 @@ import (
 	"fmt"
 )
 
-func GetALlChartsOrderedByName() (*sql.Rows, error) {
-	return DB.Query(`SELECT * FROM charts GROUP BY name;`)
+// <editor-fold desc="For Table: charts">
+
+func GetAllCharts() (*sql.Rows, error) {
+	return DB.Query(`SELECT * FROM charts`)
 }
 
-func GetInfo() *sql.Row {
-	return DB.QueryRow(`SELECT * FROM registry;`)
+func GetALlChartsOrderedByName() (*sql.Rows, error) {
+	return DB.Query(`SELECT * FROM charts GROUP BY name;`)
 }
 
 // GetChartByFilename Retrieve a Chart by his filename in URLs
@@ -40,3 +42,13 @@ func IfChartExist(chart Entity.ChartDTO) bool {
 	}
 	return true
 }
+
+// </editor-fold>
+
+// <editor-fold desc="For Table: registry">
+
+func GetInfo() *sql.Row {
+	return DB.QueryRow(`SELECT * FROM registry;`)
+}
+
+// </editor-fold>
