@@ -12,7 +12,26 @@ There are 2 parts :
 - **Frontend** : Build in ReactJS, for Web UI to manage Helm registry
 
 These parts are Docker images, that you use and deploy him in Docker env.
-![](architecture.png)
+
+## Features :sparkles:
+- expose `index.yaml` file and `/charts/*.tgz` charts, according to the [Helm registry requirement](https://helm.sh/docs/topics/chart_repository/)
+- **Chart Discovery** : Automatically insert/update/delete charts from the charts directory, in database and update the `index.yaml` file.
+- Customize the home page of the registry (`/`) with a CRD (`helm`) to describe your registry.
+
+### Environment 
+- [x]  On **Windows**
+- [x] On **Linux**
+- [x] On **Docker**, use the Docker image to deploy this registry on Docker env. You can use a Docker Compose file to deploy this (an [exemple here](docker-compose.yaml))
+
+### Helm commands coverage
+![Static Badge](https://img.shields.io/badge/40%25-covrage?style=for-the-badge&logo=helm&label=Commands%20covrage&color=orange)
+The Helm client-side commands that you can use with this registry. Doc [here](https://helm.sh/docs/helm/helm_repo/)
+- [x]  **helm repo add** :  Able to add the registry in your Helm client
+- [x] **helm repo update** : Update your client copy of your distant registry to be able to pull chart
+- [x] **helm search repo** : Able to list all charts available in your registry
+- [x] **helm pull** : Able to pull a chart from your registry to use it 
+- [ ] **helm push** : ?????????????????
+- [ ] **flags: --pass-credentials, --password, --password-stdin and --username** : Currently any credential is required to use the registry (_in coming in newer version_)
 
 ## Get stated :rocket:
 
