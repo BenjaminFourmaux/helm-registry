@@ -13,6 +13,8 @@ There are 2 parts :
 
 These parts are Docker images, that you use and deploy him in Docker env.
 
+![](architecture.png)
+
 ## Features :sparkles:
 - expose `index.yaml` file and `/charts/*.tgz` charts, according to the [Helm registry requirement](https://helm.sh/docs/topics/chart_repository/)
 - **Chart Discovery** : Automatically insert/update/delete charts from the charts directory, in database and update the `index.yaml` file.
