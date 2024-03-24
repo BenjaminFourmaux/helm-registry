@@ -34,9 +34,20 @@ The Helm client-side commands that you can use with this registry. Doc [here](ht
 - [x] **helm search repo** : Able to list all charts available in your registry
 - [x] **helm pull** : Able to pull a chart from your registry to use it 
 - [ ] **helm push** : ?????????????????
-- [ ] **flags: --pass-credentials, --password, --password-stdin and --username** : Currently any credential is required to use the registry (_in coming in newer version_)
+- [ ] **flags** : (`--pass-credentials, --password, --password-stdin and --username`) Currently any credential is required to use the registry (_in coming in newer version_)
 
 ## Get stated :rocket:
+
+### Install from source code
+
+
+### Install on Linux
+
+
+### Install on Windows
+
+
+### Install on Docker
 
 ### Environment Variables
 It exists some environment variables to customize the registry.
@@ -53,7 +64,7 @@ It exists some environment variables to customize the registry.
 
 ## Version
 [![](https://badgen.net/github/tag/BenjaminFourmaux/Helm-Registry?cache=600)](https://github.com/BenjaminFourmaux/Helm-Registry/tags) [![](https://badgen.net/github/release/BenjaminFourmaux/Helm-Registry?cache=600)](https://github.com/BenjaminFourmaux/Helm-Registry/releases)
-- [coming soon][v1] First API version with basic actions
+- [v1] First API version with basic actions for a simple usage. According to the Helm repository requirements
 
 ## Contributors 👪
 [![](https://badgen.net/github/contributors/BenjaminFourmaux/Helm-Hegistry)](https://github.com/BenjaminFourmaux/Helm-Registry/graphs/contributors)
