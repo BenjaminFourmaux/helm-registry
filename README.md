@@ -79,4 +79,4 @@ You can:
 
 You must **Mention** the © Copyright if you use and modified code for your own profit. Thank you
 
-© 2004 - Benjamin Fourmaux -- Beruet - All right reserved
+© 2024 - Benjamin Fourmaux -- Beruet - All right reserved
