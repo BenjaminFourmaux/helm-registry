@@ -18,6 +18,7 @@ These parts are Docker images, that you use and deploy him in Docker env.
 ## Features :sparkles:
 - expose `index.yaml` file and `/charts/*.tgz` charts, according to the [Helm registry requirement](https://helm.sh/docs/topics/chart_repository/)
 - **Chart Discovery** : Automatically insert/update/delete charts from the charts directory, in database and update the `index.yaml` file.
+- **Chart Discovery** : Browse all `.tgz` files and open them to search file `Chart.yaml` inside, extract chart information and send this to the Database and updating `index.yaml` file.
 - Customize the home page of the registry (`/`) with a CRD (`helm`) to describe your registry.
 
 ### Environment 
@@ -51,11 +52,11 @@ It exists some environment variables to customize the registry.
 | `CHARTS_DIR`              | Path of charts directory location. By default : for Linux `/usr/helm-registry/charts`, Windows `%USERPROFILE%\Documents\helm-registry\charts` |
 
 ## Version
-[![](https://badgen.net/github/tag/BenjaminFourmaux/helm-registry?cache=600)](https://github.com/BenjaminFourmauxhelm-registry/tags) [![](https://badgen.net/github/release/BenjaminFourmaux/helm-registry?cache=600)](https://github.com/BenjaminFourmaux/helm-registry/releases)
+[![](https://badgen.net/github/tag/BenjaminFourmaux/Helm-Registry?cache=600)](https://github.com/BenjaminFourmaux/Helm-Registry/tags) [![](https://badgen.net/github/release/BenjaminFourmaux/Helm-Registry?cache=600)](https://github.com/BenjaminFourmaux/Helm-Registry/releases)
 - [coming soon][v1] First API version with basic actions
 
 ## Contributors 👪
-[![](https://badgen.net/github/contributors/BenjaminFourmaux/helm-registry)](https://github.com/BenjaminFourmaux/helm-registry/graphs/contributors)
+[![](https://badgen.net/github/contributors/BenjaminFourmaux/Helm-Hegistry)](https://github.com/BenjaminFourmaux/Helm-Registry/graphs/contributors)
 - :crown: [Benjamin Fourmaux](https://github.com/BenjaminFourmaux)
 
 ## Licence ⚖️
