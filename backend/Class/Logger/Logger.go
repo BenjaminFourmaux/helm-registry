@@ -49,7 +49,9 @@ func Separator() {
 
 // Welcome to Display a welcome message at the start
 func Welcome() {
-	println("Welcome on Helm Registry")
+	println("------{ Welcome on Helm Registry }------")
+	println("Ahoy!")
+	println("A simple Helm chart registry")
 	println()
 	println("Version :", "1.0.0")
 	println()
