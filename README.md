@@ -28,13 +28,14 @@ These parts are Docker images, that you use and deploy him in Docker env.
 
 ### Helm commands coverage
 ![Static Badge](https://img.shields.io/badge/40%25-covrage?style=for-the-badge&logo=helm&label=Commands%20covrage&color=orange)
+
 The Helm client-side commands that you can use with this registry. Doc [here](https://helm.sh/docs/helm/helm_repo/)
 - [x]  **helm repo add** :  Able to add the registry in your Helm client
 - [x] **helm repo update** : Update your client copy of your distant registry to be able to pull chart
 - [x] **helm search repo** : Able to list all charts available in your registry
 - [x] **helm pull** : Able to pull a chart from your registry to use it 
 - [ ] **helm push** : ?????????????????
-- [ ] **flags** : (`--pass-credentials, --password, --password-stdin and --username`) Currently any credential is required to use the registry (_in coming in newer version_)
+- [ ] **flags** : (--pass-credentials, --password, --password-stdin and --username) Currently any credential is required to use the registry (_in coming in newer version_)
 
 ## Get stated :rocket:
 
