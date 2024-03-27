@@ -46,3 +46,12 @@ func Raise(err string) {
 func Separator() {
 	println("----------------------------------")
 }
+
+// Welcome to Display a welcome message at the start
+func Welcome() {
+	println("Welcome on Helm Registry")
+	println()
+	println("Version :", "1.0.0")
+	println()
+	println("App is going to start ...")
+}
