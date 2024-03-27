@@ -9,7 +9,6 @@ import (
 // Using var instead of os.getEnv() for improve security against EnvVarInjection
 // That store en var in the program memory instead of each time calling os.getEnv and get changed value
 var (
-	IS_DOCKER               bool   // IS_DOCKER Env var - True if on Docker env, False if is on Windows or Linux
 	INDEX_FILE_PATH         string // INDEX_FILE_PATH Env var - Path to the index.yaml file
 	CHARTS_DIR              string // REPOSITORY_DIR Env var - Path to the charts folder
 	REGISTRY_NAME           string // REGISTRY_NAME Env var - Name of this registry
@@ -21,8 +20,8 @@ var (
 )
 
 func SetupEnv() {
-	// Get the running env (Docker or not)
-	isDocker := IsDocker()
+	// Get the running env
+	getOSPlatform()
 
 	// Get Env vars and if not declared, init it with default value
 	if os.Getenv("INDEX_FILE_PATH") == "" {
@@ -33,7 +32,6 @@ func SetupEnv() {
 		if runtime.GOOS == "windows" {
 			userDocs := os.Getenv("USERPROFILE") + "\\Documents\\helm-registry\\charts"
 			_ = os.Setenv("CHARTS_DIR", userDocs)
-			//_ = os.Setenv("CHARTS_DIR", "../test/chart")
 
 		} else { // Linux and Docker platforms
 			_ = os.Setenv("CHARTS_DIR", "/usr/helm-registry/charts")
@@ -41,7 +39,6 @@ func SetupEnv() {
 	}
 
 	// Save env var change after permutation in class properties
-	IS_DOCKER = isDocker
 	INDEX_FILE_PATH = os.Getenv("INDEX_FILE_PATH")
 	CHARTS_DIR = os.Getenv("CHARTS_DIR")
 	REGISTRY_NAME = os.Getenv("REGISTRY_NAME")
@@ -61,18 +58,20 @@ func SetupEnv() {
 		} else {
 			Logger.Success("Creating CHARTS_DIR on : " + CHARTS_DIR)
 		}
+	} else {
+		Logger.Success("Charts Directory is on : " + CHARTS_DIR)
 	}
 }
 
-func IsDocker() bool {
-	_, err := os.Stat("/.dockerenv")
-	if err == nil {
-		Logger.Info("App running on Docker")
-		return true
-	} else if os.IsNotExist(err) {
-		Logger.Info("App not running on Docker")
-		return false
+func getOSPlatform() {
+	if runtime.GOOS == "windows" {
+		Logger.Info("OS Platform : Windows")
 	} else {
-		return false
+		_, err := os.Stat("/.dockerenv")
+		if os.IsNotExist(err) {
+			Logger.Info("OS Platform : Linux")
+		} else {
+			Logger.Info("OS Platform : Docker")
+		}
 	}
 }

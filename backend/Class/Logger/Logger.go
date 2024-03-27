@@ -55,5 +55,5 @@ func Welcome() {
 	println()
 	println("Version :", "1.0.0")
 	println()
-	println("App is going to start ...")
+	Info("App is going to start ...")
 }
