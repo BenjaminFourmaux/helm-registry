@@ -3,3 +3,6 @@
 
 # Obsidia IDE config
 .obsidian
+
+# Build articfacts directory
+.build
