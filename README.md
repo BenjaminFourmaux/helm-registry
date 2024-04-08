@@ -40,15 +40,41 @@ The Helm client-side commands that you can use with this registry. Doc [here](ht
 ## Get stated :rocket:
 
 ### Install from source code
+> You need to have the corresponding Golang version installed.
 
+Download the zip or clone this repository, and go to to `backend` folder. Execute these following commands
+
+Download packages :
+```bash
+go mod download
+```
+
+Run the app :
+```bash
+go run .
+```
 
 ### Install on Linux
 
 
 ### Install on Windows
-
+Download the .exe file and place it wherever you want. Execute the file and voilà !
+That create `registry.db` and `index.yaml`. So it is better to place it in a specific folder.
 
 ### Install on Docker
+From image archive .tar, load the image :
+```bash
+docker load -i Helm-Registry-x.x.x_docker.tar
+```
+
+Run Docker container :
+```bash
+docker run helm-registry:x.x.x
+```
+With flags :
+```bash
+docker run -p 8080 --mount type=volume,target=/usr/helm-registry/charts,dst=/charts helm-registry:x.x.x
+```
 
 ### Environment Variables
 It exists some environment variables to customize the registry.
@@ -67,8 +93,8 @@ It exists some environment variables to customize the registry.
 [![](https://badgen.net/github/tag/BenjaminFourmaux/Helm-Registry?cache=600)](https://github.com/BenjaminFourmaux/Helm-Registry/tags) [![](https://badgen.net/github/release/BenjaminFourmaux/Helm-Registry?cache=600)](https://github.com/BenjaminFourmaux/Helm-Registry/releases)
 - [v1] First API version with basic actions for a simple usage. According to the Helm repository requirements
 
-## Contributors 👪
-[![](https://badgen.net/github/contributors/BenjaminFourmaux/Helm-Hegistry)](https://github.com/BenjaminFourmaux/Helm-Registry/graphs/contributors)
+## Contributors 👥
+[![](https://badgen.net/github/contributors/BenjaminFourmaux/Helm-Registry)](https://github.com/BenjaminFourmaux/Helm-Registry/graphs/contributors)
 - :crown: [Benjamin Fourmaux](https://github.com/BenjaminFourmaux)
 
 ## Licence ⚖️
