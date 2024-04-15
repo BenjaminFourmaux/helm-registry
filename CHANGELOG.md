@@ -10,7 +10,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) 
 ## V.1.0 - Basics features requirement 
 ### Added
 - **Charts Discovery**
-	- The Charts Directory is the Single Source of Truth (SSoT).
+	- The Charts Directory is the Single Source of Truth (SSoT) !
 	- Implement Charts Directory Watcher, that listen when a action (create a file, remove file, modified file...) is dispense.
 - **API**
 	- Endpoint `/`, the home page to get this registry informations (in YAML output format).
@@ -25,3 +25,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) 
 - **Docker**
 	- Dockerfile : For build a Docker image of the app.
 	- Docker compose file :  For deploying a registry container with compose.
+- **Env**
+	- Manage env var 
+- **Misc**
+	- Get OS environment that run this app (Windows, Linux or Docker) and adapte the comportement
