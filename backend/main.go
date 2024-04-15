@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	Logger.Info("Helm Registry - Started")
+	Logger.Welcome()
 
 	// Setup env
 	env.SetupEnv()

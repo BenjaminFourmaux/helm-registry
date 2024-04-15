@@ -1,1 +1,8 @@
+# JetBrain IDE config
 .idea
+
+# Obsidia IDE config
+.obsidian
+
+# Build articfacts directory
+.build
