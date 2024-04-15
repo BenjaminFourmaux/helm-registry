@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Usage
+# run this command at the root of the project
+
 # Welcome message
 echo "Pipeline build packages"
 
@@ -31,7 +34,7 @@ cd backend
 
 # Build for Windows
 echo "Building for Windows..."
-GOOS=windows GOARCH=amd64 go build -ldflags "${release_ldflags}" -o "${build_dir}/${release_prefix}_windows.exe"
+GOOS=windows GOARCH=amd64 go build -o "${build_dir}/${release_prefix}_windows.exe"
 if [ $? -eq 0 ]; then
     echo "Build for Windows successful"
     echo "> Artifact build in    ${build_dir}/${release_prefix}_windows.exe"
@@ -42,13 +45,14 @@ fi
 
 # Build for Linux
 echo "Building for Linux..."
-GOOS=linux GOARCH=amd64 go build -ldflags "${release_ldflags}" -o "${build_dir}/${release_prefix}"
+set CGO_ENABLED=1
+GOOS=linux GOARCH=amd64 CGO_ENABLED=1 go build -o "${build_dir}/${release_name,,}"
 if [ $? -eq 0 ]; then
     echo "Build for Linux successful"
-    echo "> Artifact build in    ${build_dir}/${release_prefix}"
+    echo "> Artifact build in    ${build_dir}/${release_name,,}"
 
     # Zip
-    tar -czvf "${build_dir}/${release_prefix}_linux.tar.gz" -C "${build_dir}" "${release_prefix}"
+    tar -czvf "${build_dir}/${release_prefix}_linux.tar.gz" -C "${build_dir}" "${release_name,,}"
 else
     echo "Failed to build for Linux"
     exit 1
