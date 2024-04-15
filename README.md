@@ -55,10 +55,28 @@ go run .
 ```
 
 ### Install on Linux
+Download the file `Helm-Registry-x.x.x_linux.tar.gz` from release artifacts in your Linux system.
+Uncompressed the archive with the following command : 
+```bash
+tar -xzvf Helm-Registry-1.0.0_linux.tar.gz
+```
 
+> I recommend to uncompressed this archive in the path `/app/helm-registry/`. It's better to regroup all files in a same folder.
+
+Adding permissions to execute the app
+```bash
+chmod +x helm-registry
+```
+
+And launch the app
+```bash
+./helm-registry
+```
+
+ After first app launch, that created some files behind the app (like sqlite db and `index.yaml`) and create (if not exist) charts directory (default: /usr/helm-registry/charts).
 
 ### Install on Windows
-Download the .exe file and place it wherever you want. Execute the file and voilà !
+Download the .exe file from release artifacts and place it wherever you want. Execute the file and voilà !
 That create `registry.db` and `index.yaml`. So it is better to place it in a specific folder.
 
 ### Install on Docker
@@ -71,6 +89,7 @@ Run Docker container :
 ```bash
 docker run helm-registry:x.x.x
 ```
+
 With flags :
 ```bash
 docker run -p 8080 --mount type=volume,target=/usr/helm-registry/charts,dst=/charts helm-registry:x.x.x
