@@ -10,13 +10,14 @@ import (
 // That store en var in the program memory instead of each time calling os.getEnv and get changed value
 var (
 	INDEX_FILE_PATH         string // INDEX_FILE_PATH Env var - Path to the index.yaml file
-	CHARTS_DIR              string // REPOSITORY_DIR Env var - Path to the charts folder
+	CHARTS_DIR              string // CHARTS_DIR Env var - Path to the charts folder
 	REGISTRY_NAME           string // REGISTRY_NAME Env var - Name of this registry
 	REGISTRY_DESCRIPTION    string // REGISTRY_DESCRIPTION Env var - Description of this registry
 	REGISTRY_VERSION        string // REGISTRY_VERSION Env var - Version of this registry
 	REGISTRY_MAINTAINER     string // REGISTRY_MAINTAINER Env var - Name of the maintainer of this registry
 	REGISTRY_MAINTAINER_URL string // REGISTRY_MAINTAINER_URL Env var - URL of the maintainer of this registry
 	REGISTRY_LABELS         string // REGISTRY_LABELS Env var - List of labels for this registry
+	ICONS_DIR               string // ICONS_DIR Env var - Directory path of chart's icons
 )
 
 func SetupEnv() {
@@ -32,9 +33,17 @@ func SetupEnv() {
 		if runtime.GOOS == "windows" {
 			userDocs := os.Getenv("USERPROFILE") + "\\Documents\\helm-registry\\charts"
 			_ = os.Setenv("CHARTS_DIR", userDocs)
-
 		} else { // Linux and Docker platforms
 			_ = os.Setenv("CHARTS_DIR", "/usr/helm-registry/charts")
+		}
+	}
+
+	if os.Getenv("ICONS_DIR") == "" {
+		if runtime.GOOS == "windows" {
+			userDocs := os.Getenv("USERPROFILE") + "\\Documents\\helm-registry\\icons"
+			_ = os.Setenv("ICONS_DIR", userDocs)
+		} else {
+			_ = os.Setenv("ICONS_DIR", "/usr/helm-registry/icons")
 		}
 	}
 
@@ -47,21 +56,17 @@ func SetupEnv() {
 	REGISTRY_MAINTAINER = os.Getenv("REGISTRY_MAINTAINER")
 	REGISTRY_MAINTAINER_URL = os.Getenv("REGISTRY_MAINTAINER_URL")
 	REGISTRY_LABELS = os.Getenv("REGISTRY_LABELS")
+	ICONS_DIR = os.Getenv("ICONS_DIR")
 
 	// Create directories
 
-	// if CHARTS_DIR not exist, create it
-	if _, err := os.Stat(CHARTS_DIR); os.IsNotExist(err) {
-		err := os.MkdirAll(CHARTS_DIR, 0755)
-		if err != nil {
-			Logger.Error("Error creating directory : " + CHARTS_DIR)
-		} else {
-			Logger.Success("Creating CHARTS_DIR on : " + CHARTS_DIR)
-		}
-	} else {
-		Logger.Success("Charts Directory is on : " + CHARTS_DIR)
-	}
+	// if dirs not exist, create them
+	createDirIfNotExist(CHARTS_DIR)
+	createDirIfNotExist(ICONS_DIR)
+
 }
+
+// <editor-fold desc="Utils functions">
 
 func getOSPlatform() {
 	if runtime.GOOS == "windows" {
@@ -75,3 +80,19 @@ func getOSPlatform() {
 		}
 	}
 }
+
+// createDirIfNotExist Create a new dir if not exist (Duplicated from Class.Directory)
+func createDirIfNotExist(path string) {
+	if _, err := os.Stat(path); os.IsNotExist(err) {
+
+		err := os.MkdirAll(path, 0755)
+
+		if err != nil {
+			Logger.Error("Error creating directory : " + path)
+		} else {
+			Logger.Success("Creating new directory on : " + path)
+		}
+	}
+}
+
+// </editor-fold>

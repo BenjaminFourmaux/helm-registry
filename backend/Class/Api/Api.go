@@ -111,8 +111,7 @@ func EndpointIndexYAML() {
 }
 
 func EndpointCharts() {
-	chartDir := env.CHARTS_DIR
-	chartHandler := http.FileServer(http.Dir(chartDir))
+	chartHandler := http.FileServer(http.Dir(env.CHARTS_DIR))
 
 	http.HandleFunc("/charts/", func(w http.ResponseWriter, req *http.Request) {
 		traceRequest(req)
@@ -120,8 +119,17 @@ func EndpointCharts() {
 	})
 }
 
+func EndpointIcons() {
+	iconHandler := http.FileServer(http.Dir(env.ICONS_DIR))
+
+	http.HandleFunc("/icons/", func(w http.ResponseWriter, req *http.Request) {
+		traceRequest(req)
+		http.StripPrefix("/icons/", iconHandler)
+	})
+}
+
 // </editor-fold>
 
 func traceRequest(req *http.Request) {
-	Logger.Info("Request to '" + req.URL.Path + "'")
+	Logger.Info("HTTP - Request to '" + req.URL.Path + "'")
 }

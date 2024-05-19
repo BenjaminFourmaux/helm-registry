@@ -43,6 +43,7 @@ func main() {
 	Api.EndpointHelpRedirect()
 	Api.EndpointIndexYAML()
 	Api.EndpointCharts()
+	Api.EndpointIcons()
 
 	// Start HTTP Server
 	Logger.Info("Start HTTP Server")
