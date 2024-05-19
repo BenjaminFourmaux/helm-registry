@@ -142,3 +142,17 @@ func IsFilenameInDirectoryFiles(filename string, list []string) bool {
 	}
 	return false
 }
+
+// CreateDirIfNotExist Create a new dir if not exist
+func CreateDirIfNotExist(path string) {
+	if _, err := os.Stat(path); os.IsNotExist(err) {
+
+		err := os.MkdirAll(path, 0755)
+
+		if err != nil {
+			Logger.Error("Error creating directory : " + path)
+		} else {
+			Logger.Success("Creating new directory on : " + path)
+		}
+	}
+}
