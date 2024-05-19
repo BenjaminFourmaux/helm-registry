@@ -12,6 +12,7 @@ import (
 	"gopkg.in/yaml.v2"
 	"io"
 	"net/http"
+	"strconv"
 	"strings"
 )
 
@@ -23,7 +24,7 @@ func StartServer() {
 		Logger.Error("Fail to launch HTTP Server")
 		Logger.Raise(err.Error())
 	} else {
-		Logger.Success("HTTP Server is on listening")
+		Logger.Success("HTTP Server listening on port " + strconv.Itoa(port))
 	}
 
 }
@@ -113,19 +114,13 @@ func EndpointIndexYAML() {
 func EndpointCharts() {
 	chartHandler := http.FileServer(http.Dir(env.CHARTS_DIR))
 
-	http.HandleFunc("/charts/", func(w http.ResponseWriter, req *http.Request) {
-		traceRequest(req)
-		http.StripPrefix("/charts/", chartHandler)
-	})
+	http.Handle("/charts/", http.StripPrefix("/charts/", chartHandler))
 }
 
 func EndpointIcons() {
 	iconHandler := http.FileServer(http.Dir(env.ICONS_DIR))
 
-	http.HandleFunc("/icons/", func(w http.ResponseWriter, req *http.Request) {
-		traceRequest(req)
-		http.StripPrefix("/icons/", iconHandler)
-	})
+	http.Handle("/icons/", http.StripPrefix("/icons/", iconHandler))
 }
 
 // </editor-fold>

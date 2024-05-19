@@ -58,9 +58,7 @@ func SetupEnv() {
 	REGISTRY_LABELS = os.Getenv("REGISTRY_LABELS")
 	ICONS_DIR = os.Getenv("ICONS_DIR")
 
-	// Create directories
-
-	// if dirs not exist, create them
+	// If dirs not exist, create directories
 	createDirIfNotExist(CHARTS_DIR)
 	createDirIfNotExist(ICONS_DIR)
 
