@@ -20,9 +20,10 @@ These parts are Docker images, that you use and deploy him in Docker env.
 - **Chart Discovery** : Automatically insert/update/delete charts from the charts directory, in database and update the `index.yaml` file.
 - **Chart Discovery** : Browse all `.tgz` files and open them to search file `Chart.yaml` inside, extract chart information and send this to the Database and updating `index.yaml` file.
 - Customize the home page of the registry (`/`) with a CRD (`helm`) to describe your registry.
+- Host chart's icons for use icon in private cluster. A solution to fix [Not able to use the local icon image for packaging](https://github.com/helm/helm/issues/2943)
 
 ### Environment 
-- [x]  On **Windows**
+- [x] On **Windows**
 - [x] On **Linux**
 - [x] On **Docker**, use the Docker image to deploy this registry on Docker env. You can use a Docker Compose file to deploy this (an [exemple here](docker-compose.yaml))
 
@@ -42,7 +43,7 @@ The Helm client-side commands that you can use with this registry. Doc [here](ht
 ### Install from source code
 > You need to have the corresponding Golang version installed.
 
-Download the zip or clone this repository, and go to to `backend` folder. Execute these following commands
+Download the zip or clone this repository, and go to `backend` folder. Execute these following commands
 
 Download packages :
 ```bash
