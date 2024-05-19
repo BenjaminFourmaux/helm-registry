@@ -10,6 +10,7 @@ services:
     networks:
       - helm-net
     #volumes:
+      #- ./assets/icons/:/usr/helm-registry/icons
       #- ./test/chart/test-nginx-1.0.0.tgz:/usr/helm-registry/charts/test-nginx-1.0.0.tgz # An exemple for how to provisionne a chart .tgz file
 
   testcontainer:
