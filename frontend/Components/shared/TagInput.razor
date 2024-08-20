@@ -1,0 +1,15 @@
+﻿@namespace frontend.Components.Shared
+
+<div class="tagInput">
+    @foreach (var tag in Tags)
+    {
+        <span class="tag tag-@tag.color">@tag.label</span>
+    }
+</div>
+
+@code {
+    @using frontend.Models
+
+    [Parameter]
+    public TagItem[] Tags { get; set; } = [];
+}
