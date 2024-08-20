@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
@@ -18,13 +18,14 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="wwwroot\assets\img\" />
     <Folder Include="wwwroot\css\" />
     <Folder Include="wwwroot\css\fonts\" />
     <Folder Include="wwwroot\js\" />
   </ItemGroup>
 
-	<Target Name="DownloadLibs" BeforeTargets="Build">
-		<Exec Command="powershell -ExecutionPolicy Bypass -File download-libs.ps1" />
-	</Target>
+  <Target Name="DownloadLibs" BeforeTargets="Build" Condition="'$(Configuration)' == 'Release'">
+    <Exec Command="powershell -ExecutionPolicy Bypass -File download-libs.ps1" />
+  </Target>
 
 </Project>
