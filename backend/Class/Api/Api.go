@@ -18,14 +18,13 @@ import (
 func StartServer() {
 	port := 8080
 
+	Logger.Success(fmt.Sprintf("HTTP Server is on listening on port: %d", port))
+
 	err := http.ListenAndServe(fmt.Sprintf(":%d", port), nil)
 	if err != nil {
 		Logger.Error("Fail to launch HTTP Server")
 		Logger.Raise(err.Error())
-	} else {
-		Logger.Success("HTTP Server is on listening")
 	}
-
 }
 
 // <editor-fold desc="Endpoints"> Endpoints

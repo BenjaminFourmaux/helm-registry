@@ -33,6 +33,21 @@ func GetChartByCriteria(chart Entity.ChartDTO) *sql.Row {
 	return queryResult
 }
 
+// GetRepositoriesCharts Get distinct charts (by name) with last version
+func GetRepositoriesCharts() *sql.Rows {
+	var queryResult, _ = DB.Query(`
+		SELECT *
+		FROM charts c1
+		WHERE c1.version = (
+			SELECT MAX(c2.version)
+			FROM charts c2
+			WHERE c2.name = c1.name
+		);
+	`)
+
+	return queryResult
+}
+
 func IfChartExist(chart Entity.ChartDTO) bool {
 	var result = GetChartByCriteria(chart)
 	var id int

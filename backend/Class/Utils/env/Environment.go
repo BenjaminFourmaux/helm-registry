@@ -10,7 +10,7 @@ import (
 // That store en var in the program memory instead of each time calling os.getEnv and get changed value
 var (
 	INDEX_FILE_PATH         string // INDEX_FILE_PATH Env var - Path to the index.yaml file
-	CHARTS_DIR              string // REPOSITORY_DIR Env var - Path to the charts folder
+	CHARTS_DIR              string // CHARTS_DIR Env var - Path to the charts folder
 	REGISTRY_NAME           string // REGISTRY_NAME Env var - Name of this registry
 	REGISTRY_DESCRIPTION    string // REGISTRY_DESCRIPTION Env var - Description of this registry
 	REGISTRY_VERSION        string // REGISTRY_VERSION Env var - Version of this registry
