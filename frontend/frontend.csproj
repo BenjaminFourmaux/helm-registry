@@ -6,4 +6,17 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Blazor.Bootstrap" Version="3.0.0-preview.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\css\" />
+    <Folder Include="wwwroot\js\" />
+  </ItemGroup>
+
+	<Target Name="DownloadLibs" BeforeTargets="Build">
+		<Exec Command="powershell -ExecutionPolicy Bypass -File download-libs.ps1" />
+	</Target>
+
 </Project>

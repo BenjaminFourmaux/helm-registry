@@ -1,0 +1,6 @@
+# CSS & JS libs
+wwwroot/css/bootstrap*.css
+wwwroot/js/bootstrap.bundle.min.js
+wwwroot/js/chart.umd.js
+wwwroot/js/chartjs-plugin-datalabels.min.js
+wwwroot/js/Sortable.min.js
