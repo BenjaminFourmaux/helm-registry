@@ -90,6 +90,7 @@ h1:focus {
 /* Home page */
 #home div.d-flex {
     height: 40vh;
+    background-image: url(assets/img/topography.png);
 }
 #home .registry-name {
     font-size: 3.5rem;
