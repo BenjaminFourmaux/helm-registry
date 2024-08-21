@@ -63,7 +63,7 @@ func IfChartExist(chart Entity.ChartDTO) bool {
 // <editor-fold desc="For Table: registry">
 
 func GetInfo() *sql.Row {
-	return DB.QueryRow(`SELECT * FROM registry;`)
+	return DB.QueryRow(`SELECT *  FROM registry LIMIT 1;`)
 }
 
 // </editor-fold>

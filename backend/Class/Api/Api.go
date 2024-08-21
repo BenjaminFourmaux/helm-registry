@@ -64,7 +64,7 @@ func EndpointRoot() {
 
 		// Get info from Database and convert it into DTO object
 		data := Database.GetInfo()
-		data.Scan(infoDTO.Name, infoDTO.Description, infoDTO.Version, infoDTO.Maintainer, infoDTO.MaintainerUrl, infoDTO.Labels)
+		data.Scan(&infoDTO.Name, &infoDTO.Description, &infoDTO.Version, &infoDTO.Maintainer, &infoDTO.MaintainerUrl, &infoDTO.Labels)
 
 		// DTO to YAML
 		infoYAML := Entity.InfoEntity{

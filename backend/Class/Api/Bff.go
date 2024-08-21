@@ -16,7 +16,8 @@ func EndpointBFFHome() {
 		var infoDTO Entity.RegistryDTO
 
 		chartInfo := Database.GetInfo()
-		chartInfo.Scan(infoDTO.Name, infoDTO.Description, infoDTO.Version, infoDTO.Maintainer, infoDTO.MaintainerUrl, infoDTO.Labels)
+
+		chartInfo.Scan(&infoDTO.Name, &infoDTO.Description, &infoDTO.Version, &infoDTO.Maintainer, &infoDTO.MaintainerUrl, &infoDTO.Labels)
 
 		var query = Database.GetRepositoriesCharts()
 		if query.Err() != nil {
