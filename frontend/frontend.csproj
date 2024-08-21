@@ -19,7 +19,7 @@
 
   <ItemGroup>
     <Folder Include="wwwroot\assets\img\" />
-    <Folder Include="wwwroot\css\" />
+    <Folder Include="wwwroot\css\fonts\" />
     <Folder Include="wwwroot\css\fonts\" />
     <Folder Include="wwwroot\js\" />
   </ItemGroup>

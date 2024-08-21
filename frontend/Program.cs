@@ -1,4 +1,4 @@
-using frontend.Components;
+using frontend.Client;
 
 var builder = WebApplication.CreateBuilder(args);
 
