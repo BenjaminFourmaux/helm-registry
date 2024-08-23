@@ -2,6 +2,7 @@ package Api
 
 import (
 	"backend/Class/Database"
+	"backend/Class/Logger"
 	"backend/Entity"
 	"encoding/json"
 	"fmt"
@@ -12,6 +13,12 @@ import (
 func EndpointBFFHome() {
 	http.HandleFunc("/bff/home", func(w http.ResponseWriter, req *http.Request) {
 		traceRequest(req)
+
+		if req.URL.Path != "/bff/home" {
+			Logger.Warning("404 not found")
+			http.NotFound(w, req)
+			return
+		}
 
 		var infoDTO Entity.RegistryDTO
 
