@@ -1,10 +1,12 @@
 package Database
 
 import (
+	"backend/Class/Logger"
 	"backend/Entity"
 	"database/sql"
 	"errors"
 	"fmt"
+	"strconv"
 )
 
 // <editor-fold desc="For Table: charts">
@@ -23,12 +25,13 @@ func GetChartByFilename(filename string) *sql.Row {
 }
 
 func GetChartByCriteria(chart Entity.ChartDTO) *sql.Row {
+	// Maybe calculate the digest by sha256 the Chart.yaml of a chart and compare with chart's digest in db
 	var queryResult = DB.QueryRow(`
-		SELECT * FROM charts
-		WHERE name = @name
-		AND version = @version
-		AND urls LIKE '%%%@urls%%%'
-	`, chart.Name, chart.Version, chart.Urls)
+		SELECT id FROM charts
+		WHERE name = ?
+		AND version = ?
+		AND path = ?
+	`, chart.Name, chart.Version, chart.Path)
 
 	return queryResult
 }
@@ -52,6 +55,8 @@ func IfChartExist(chart Entity.ChartDTO) bool {
 	var result = GetChartByCriteria(chart)
 	var id int
 	err := result.Scan(&id)
+	Logger.Error(err.Error())
+	Logger.Debug(strconv.Itoa(id))
 	if errors.Is(err, sql.ErrNoRows) {
 		return false
 	}

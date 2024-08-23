@@ -1,7 +1,8 @@
 package Entity
 
-// File schema : https://helm.sh/docs/topics/charts/
-
+/*
+ChartFile schema : https://helm.sh/docs/topics/charts/
+*/
 type ChartFile struct {
 	APIVersion   string            `yaml:"apiVersion"`
 	Name         string            `yaml:"name"`
@@ -11,6 +12,7 @@ type ChartFile struct {
 	Type         string            `yaml:"type,omitempty"`
 	Keywords     []string          `yaml:"keywords,omitempty"`
 	Home         string            `yaml:"home,omitempty"`
+	Urls         []string          `yaml:"urls,omitempty"`
 	Sources      []string          `yaml:"sources,omitempty"`
 	Dependencies []ChartDependency `yaml:"dependencies,omitempty"`
 	Maintainers  []ChartMaintainer `yaml:"maintainers,omitempty"`

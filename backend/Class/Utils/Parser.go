@@ -8,8 +8,10 @@ import (
 	"time"
 )
 
-// ParserChartToDTO Parser ChartFile entity to Chart DTO
-func ParserChartToDTO(entity Entity.ChartFile, urls []string) Entity.ChartDTO {
+/*
+ParserChartToDTO Parser ChartFile entity to Chart DTO
+*/
+func ParserChartToDTO(entity Entity.ChartFile, path string) Entity.ChartDTO {
 	var dto = Entity.ChartDTO{
 		Name:        entity.Name,
 		Description: StringToNull(entity.Description),
@@ -18,12 +20,15 @@ func ParserChartToDTO(entity Entity.ChartFile, urls []string) Entity.ChartDTO {
 		Digest:      "", // TODO : Compute manually the hash via sha-256 algorithm
 		Home:        StringToNull(entity.Home),
 		Sources:     StringToNull(strings.Join(entity.Sources, ";")),
-		Urls:        strings.Join(urls, ";"),
+		Urls:        StringToNull(strings.Join(entity.Urls, ";")),
+		Path:        StringToNull(path),
 	}
 	return dto
 }
 
-// ParserRowsToChartDTO Parse the result of a DB rows (multiple row result) in a list of ChartDTO
+/*
+ParserRowsToChartDTO Parse the result of a DB rows (multiple row result) in a list of ChartDTO
+*/
 func ParserRowsToChartDTO(rows *sql.Rows) []Entity.ChartDTO {
 	var list []Entity.ChartDTO
 	for rows.Next() {
@@ -35,6 +40,7 @@ func ParserRowsToChartDTO(rows *sql.Rows) []Entity.ChartDTO {
 			&dto.Version,
 			&dto.Created,
 			&dto.Digest,
+			&dto.Path,
 			&dto.Home,
 			&dto.Sources,
 			&dto.Urls,
@@ -51,7 +57,9 @@ func ParserRowsToChartDTO(rows *sql.Rows) []Entity.ChartDTO {
 	return list
 }
 
-// ParserRowToChartDTO Parse the result of a DB row into a ChartDTO
+/*
+ParserRowToChartDTO Parse the result of a DB row into a ChartDTO
+*/
 func ParserRowToChartDTO(row *sql.Row) Entity.ChartDTO {
 	var dto Entity.ChartDTO
 	err := row.Scan(
@@ -61,6 +69,7 @@ func ParserRowToChartDTO(row *sql.Row) Entity.ChartDTO {
 		&dto.Version,
 		&dto.Created,
 		&dto.Digest,
+		&dto.Path,
 		&dto.Home,
 		&dto.Sources,
 		&dto.Urls,
@@ -74,7 +83,9 @@ func ParserRowToChartDTO(row *sql.Row) Entity.ChartDTO {
 	return dto
 }
 
-// NullToString Convert a sql.NullString into a string (same empty)
+/*
+NullToString Convert a sql.NullString into a string (same empty)
+*/
 func NullToString(nullString sql.NullString) string {
 	if nullString.Valid {
 		return nullString.String
@@ -83,7 +94,9 @@ func NullToString(nullString sql.NullString) string {
 	}
 }
 
-// StringToNull Convert a string to a sql.NullString
+/*
+StringToNull Convert a string to a sql.NullString
+*/
 func StringToNull(str string) sql.NullString {
 	if str == "" {
 		return sql.NullString{}

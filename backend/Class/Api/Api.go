@@ -141,7 +141,7 @@ func EndpointCharts() {
 	http.HandleFunc("/charts/", func(w http.ResponseWriter, req *http.Request) {
 		traceRequest(req)
 
-		if req.URL.Path != "/charts/" {
+		if !strings.Contains(req.URL.Path, "/charts/") {
 			Logger.Warning("404 not found")
 			http.NotFound(w, req)
 			return

@@ -16,11 +16,12 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
-	"strings"
 )
 
-// Discovery Browse all compressed file in the charts directory and check if all charts are in database.
-// Otherwise, add them
+/*
+Discovery Browse all compressed file in the charts directory and check if all charts are in database.
+Otherwise, add them
+*/
 func Discovery() {
 	Logger.Info("Discovering charts")
 
@@ -52,6 +53,7 @@ func Discovery() {
 			for {
 				header, err := tarReader.Next()
 				if err == io.EOF {
+					Logger.Error(err.Error())
 					break
 				}
 				if header.Typeflag == tar.TypeReg {
@@ -69,10 +71,11 @@ func Discovery() {
 						}
 
 						// 5. Create the DTO entity with the data from file
-						urls := Utils.GenerateChartUrls(Utils.GetFilenameFromPath(file.Name()))
-						var dto = Utils.ParserChartToDTO(dataFile, urls)
+						path := Utils.GenerateChartPath(Utils.GetFilenameFromPath(file.Name()))
+						var dto = Utils.ParserChartToDTO(dataFile, path)
 
 						// 6. Check if chart already exist in the database
+						// TODO: Bug reported => duplicate chart in db
 						if Database.IfChartExist(dto) {
 							// 7.a Update chart in db
 							var chartId = Utils.ParserRowToChartDTO(Database.GetChartByCriteria(dto)).Id
@@ -92,7 +95,9 @@ func Discovery() {
 	}
 }
 
-// RepositoryDirectoryWatcher Initialize the Directory Watcher Listener and call appropriate functions when Events throw
+/*
+RepositoryDirectoryWatcher Initialize the Directory Watcher Listener and call appropriate functions when Events throw
+*/
 func RepositoryDirectoryWatcher() {
 	// Create a Watcher
 	watcher, err := fsnotify.NewWatcher()
@@ -126,7 +131,9 @@ func RepositoryDirectoryWatcher() {
 	}()
 }
 
-// actionTrigger Chose an action by the event operation
+/*
+actionTrigger Chose an action by the event operation
+*/
 func actionTrigger(event fsnotify.Event) {
 	switch event.Op.String() {
 	case "CREATE":
@@ -148,8 +155,10 @@ func actionTrigger(event fsnotify.Event) {
 	UpdateIndex()
 }
 
-// checkRemovedChartFile Browse all files of the charts directory, get only .tgz file and add them into a list of file
-// name and check if in the db, all charts entry has equivalent in directory. Otherwise, delete him
+/*
+checkRemovedChartFile Browse all files of the charts directory, get only .tgz file and add them into a list of file
+name and check if in the db, all charts entry has equivalent in directory. Otherwise, delete him
+*/
 func checkRemovedChartFile(files []os.DirEntry) {
 	Logger.Info("Discovering charts - Check for removed chart files")
 
@@ -170,13 +179,10 @@ func checkRemovedChartFile(files []os.DirEntry) {
 	// 3. Browse all charts in db and get chart id not in directory
 	for _, chart := range listALlChartsDTO {
 		var isOnDirectory = false
-		var listUrls = strings.Split(chart.Urls, ";")
 
-		// 4. Browse chart's urls
-		for _, url := range listUrls {
-			if IsFilenameInDirectoryFiles(filepath.Base(url), filenames) {
-				isOnDirectory = true
-			}
+		// 4. If file exist
+		if IsFilenameInDirectoryFiles(filepath.Base(Utils.NullToString(chart.Path)), filenames) {
+			isOnDirectory = true
 		}
 
 		// 5. Add id of chart if not in directory (a deleted file chart)
@@ -193,7 +199,9 @@ func checkRemovedChartFile(files []os.DirEntry) {
 	}
 }
 
-// insertDBFromNewFile Send to BD info of a new chart creating in the repository directory
+/*
+insertDBFromNewFile Send to BD info of a new chart creating in the repository directory
+*/
 func insertDBFromNewFile(filepath string) {
 	// Open tar archive
 	file, err := os.Open(Utils.ConvertWindowsPathToUnix(filepath))
@@ -239,8 +247,8 @@ func insertDBFromNewFile(filepath string) {
 				}
 
 				// Create the DTO entity with the data from file
-				urls := Utils.GenerateChartUrls(Utils.GetFilenameFromPath(file.Name()))
-				var dto = Utils.ParserChartToDTO(dataFile, urls)
+				path := Utils.GenerateChartPath(Utils.GetFilenameFromPath(file.Name()))
+				var dto = Utils.ParserChartToDTO(dataFile, path)
 
 				// Insert to the database
 				Database.InsertChart(dto)
@@ -250,7 +258,9 @@ func insertDBFromNewFile(filepath string) {
 	}
 }
 
-// deleteDBFromRemoveFile Delete on the DB when a .tar file is removed
+/*
+deleteDBFromRemoveFile Delete on the DB when a .tar file is removed
+*/
 func deleteDBFromRemoveFile(filepath string) {
 	result := Database.GetChartByFilename(Utils.GetFilenameFromPath(filepath))
 

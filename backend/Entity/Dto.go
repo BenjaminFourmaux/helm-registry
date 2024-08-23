@@ -5,16 +5,19 @@ import (
 	"time"
 )
 
+// Represent database tables structure
+
 type ChartDTO struct {
-	Id          int            `json:"id"`
+	Id          int            `json:"id"` // Auto generate
 	Name        string         `json:"name"`
 	Description sql.NullString `json:"description"` // nullable string field
 	Version     string         `json:"version"`
 	Created     time.Time      `json:"created"`
 	Digest      string         `json:"digest"`
+	Path        sql.NullString `json:"path"`    // Location in chart directory
 	Home        sql.NullString `json:"home"`    // nullable string field
 	Sources     sql.NullString `json:"sources"` // nullable string field
-	Urls        string         `json:"urls"`
+	Urls        sql.NullString `json:"urls"`    // nullable string field
 }
 
 type RegistryDTO struct {
