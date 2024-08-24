@@ -36,7 +36,7 @@ func Discovery() {
 	chartsInDB := Utils.ParserRowsToChartDTO(chartsRows)
 
 	// 1. Check for deleted chart file
-	//checkRemovedChartFile(files)
+	checkRemovedChartFile(files)
 
 	Logger.Info("Discovering charts - Check for new/updated chart")
 
@@ -79,8 +79,6 @@ func Discovery() {
 
 						// 6. Check if chart already exist in the database
 						isExist, existChartId := Utils.IsChartAlreadyExist(chartsInDB, dto)
-						fmt.Println(isExist)
-						fmt.Println(existChartId)
 						if isExist {
 							// 7.a Update chart because if already exist
 							Logger.Info("Update chart")

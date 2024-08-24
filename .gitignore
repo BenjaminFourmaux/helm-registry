@@ -408,3 +408,5 @@ FodyWeavers.xsd
 # Build articfacts directory
 .build
 
+# Registry Database
+/backend/registry.db
