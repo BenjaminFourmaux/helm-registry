@@ -23,7 +23,11 @@ func EndpointBFFHome() {
 		var infoDTO Entity.RegistryDTO
 
 		chartInfo := Database.GetInfo()
-		chartInfo.Scan(infoDTO.Name, infoDTO.Description, infoDTO.Version, infoDTO.Maintainer, infoDTO.MaintainerUrl, infoDTO.Labels)
+		err := chartInfo.Scan(&infoDTO.Name, &infoDTO.Description, &infoDTO.Version, &infoDTO.Maintainer, &infoDTO.MaintainerUrl, &infoDTO.Labels)
+		if err != nil {
+			Logger.Error("error")
+			Logger.Raise(err.Error())
+		}
 
 		var query = Database.GetRepositoriesCharts()
 		if query.Err() != nil {
@@ -35,12 +39,17 @@ func EndpointBFFHome() {
 		}
 
 		response := Entity.BffHomeResponse{
-			Name:          infoDTO.Name,
-			Description:   infoDTO.Description,
-			Maintainer:    infoDTO.Maintainer,
-			MaintainerUrl: infoDTO.MaintainerUrl,
-			Labels:        strings.Split(infoDTO.Labels, ";"),
+			Name:          infoDTO.Name.String,
+			Description:   infoDTO.Description.String,
+			Maintainer:    infoDTO.Maintainer.String,
+			MaintainerUrl: infoDTO.MaintainerUrl.String,
 			NumberOfRepos: count,
+		}
+
+		if infoDTO.Labels.Valid {
+			response.Labels = strings.Split(infoDTO.Labels.String, ";")
+		} else {
+			response.Labels = []string{}
 		}
 
 		w.Header().Set("Content-Type", "application/json")

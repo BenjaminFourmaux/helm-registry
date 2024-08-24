@@ -73,22 +73,6 @@ func GetRepositoriesCharts() *sql.Rows {
 	return queryResult
 }
 
-func IfChartExist(chart Entity.ChartDTO) (bool, int) {
-	var id int = 0
-
-	queryResult := DB.QueryRow(`
-		SELECT id FROM charts WHERE name = ? AND version = ? AND path = ?
-	`, chart.Name, chart.Version, Utils.NullToString(chart.Path))
-
-	err := queryResult.Scan(&id)
-	fmt.Println(id)
-	if err != nil {
-		return false, 0
-	} else {
-		return true, id
-	}
-}
-
 // </editor-fold>
 
 // <editor-fold desc="For Table: registry">

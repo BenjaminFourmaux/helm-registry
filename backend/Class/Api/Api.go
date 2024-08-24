@@ -90,12 +90,12 @@ func EndpointRoot() {
 			ApiVersion: "v1",
 			Kind:       "helm/registry",
 			Registry: Entity.InfoRegistryEntity{
-				Name:          infoDTO.Name,
-				Description:   infoDTO.Description,
-				Version:       infoDTO.Version,
-				Maintainer:    infoDTO.Maintainer,
-				MaintainerUrl: infoDTO.MaintainerUrl,
-				Labels:        strings.Split(infoDTO.Labels, ";"),
+				Name:          infoDTO.Name.String,
+				Description:   infoDTO.Description.String,
+				Version:       infoDTO.Version.String,
+				Maintainer:    infoDTO.Maintainer.String,
+				MaintainerUrl: infoDTO.MaintainerUrl.String,
+				Labels:        strings.Split(infoDTO.Labels.String, ";"),
 			},
 		}
 

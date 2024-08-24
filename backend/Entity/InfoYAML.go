@@ -9,7 +9,7 @@ type InfoEntity struct {
 type InfoRegistryEntity struct {
 	Name          string   `yaml:"name"`
 	Description   string   `yaml:"description"`
-	Version       int      `yaml:"version"`
+	Version       string   `yaml:"version"`
 	Maintainer    string   `yaml:"maintainer"`
 	MaintainerUrl string   `yaml:"maintainer_url"`
 	Labels        []string `yaml:"labels"`

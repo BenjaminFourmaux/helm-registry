@@ -20,10 +20,10 @@ type ChartDTO struct {
 }
 
 type RegistryDTO struct {
-	Name          string `json:"name"`
-	Description   string `json:"description"`
-	Version       int    `json:"version"`
-	Maintainer    string `json:"maintainer"`
-	MaintainerUrl string `json:"maintainer_url"`
-	Labels        string `json:"labels"`
+	Name          sql.NullString `json:"name"`
+	Description   sql.NullString `json:"description"`
+	Version       sql.NullString `json:"version"`
+	Maintainer    sql.NullString `json:"maintainer"`
+	MaintainerUrl sql.NullString `json:"maintainer_url"`
+	Labels        sql.NullString `json:"labels"`
 }

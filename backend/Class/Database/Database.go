@@ -25,7 +25,7 @@ func CreateTableRegistry() {
 		CREATE TABLE IF NOT EXISTS registry (
 		    name TEXT NULL,
 		    description TEXT NULL,
-		    version INT NULL,
+		    version TEXT NULL,
 		    maintainer TEXT NULL,
 		    maintainer_url TEXT NULL,
 		    labels TEXT NULL
