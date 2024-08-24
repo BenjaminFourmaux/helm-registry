@@ -41,7 +41,7 @@ func UpdateIndex() {
 		var entry Entity.ChartDTO
 
 		if err := rows.Scan(&entry.Id, &entry.Name, &entry.Description, &entry.Version, &entry.Created, &entry.Digest,
-			&entry.Path, &entry.Home, &entry.Sources, &entry.Urls); err != nil {
+			&entry.Path, &entry.Home, &entry.Sources); err != nil {
 			Logger.Error("Deserialization data -> dto")
 		}
 
@@ -54,7 +54,6 @@ func UpdateIndex() {
 			Digest:      entry.Digest,
 			Home:        Utils.NullToString(entry.Home),
 			Sources:     strings.Split(Utils.NullToString(entry.Sources), ";"),
-			Urls:        strings.Split(Utils.NullToString(entry.Urls), ";"),
 		}
 
 		// Add entry in file content

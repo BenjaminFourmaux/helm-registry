@@ -17,7 +17,6 @@ type ChartDTO struct {
 	Path        sql.NullString `json:"path"`    // Location in chart directory
 	Home        sql.NullString `json:"home"`    // nullable string field
 	Sources     sql.NullString `json:"sources"` // nullable string field
-	Urls        sql.NullString `json:"urls"`    // nullable string field
 }
 
 type RegistryDTO struct {

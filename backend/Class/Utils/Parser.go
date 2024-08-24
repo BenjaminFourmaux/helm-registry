@@ -20,7 +20,6 @@ func ParserChartToDTO(entity Entity.ChartFile, path string) Entity.ChartDTO {
 		Digest:      "", // TODO : Compute manually the hash via sha-256 algorithm
 		Home:        StringToNull(entity.Home),
 		Sources:     StringToNull(strings.Join(entity.Sources, ";")),
-		Urls:        StringToNull(strings.Join(entity.Urls, ";")),
 		Path:        StringToNull(path),
 	}
 	return dto
@@ -31,6 +30,7 @@ ParserRowsToChartDTO Parse the result of a DB rows (multiple row result) in a li
 */
 func ParserRowsToChartDTO(rows *sql.Rows) []Entity.ChartDTO {
 	var list []Entity.ChartDTO
+
 	for rows.Next() {
 		var dto Entity.ChartDTO
 		err := rows.Scan(
@@ -43,7 +43,6 @@ func ParserRowsToChartDTO(rows *sql.Rows) []Entity.ChartDTO {
 			&dto.Path,
 			&dto.Home,
 			&dto.Sources,
-			&dto.Urls,
 		)
 
 		if err != nil {
@@ -53,6 +52,7 @@ func ParserRowsToChartDTO(rows *sql.Rows) []Entity.ChartDTO {
 
 		list = append(list, dto)
 	}
+	//defer rows.Close()
 
 	return list
 }
@@ -72,7 +72,6 @@ func ParserRowToChartDTO(row *sql.Row) Entity.ChartDTO {
 		&dto.Path,
 		&dto.Home,
 		&dto.Sources,
-		&dto.Urls,
 	)
 
 	if err != nil {
@@ -87,11 +86,7 @@ func ParserRowToChartDTO(row *sql.Row) Entity.ChartDTO {
 NullToString Convert a sql.NullString into a string (same empty)
 */
 func NullToString(nullString sql.NullString) string {
-	if nullString.Valid {
-		return nullString.String
-	} else {
-		return ""
-	}
+	return nullString.String
 }
 
 /*

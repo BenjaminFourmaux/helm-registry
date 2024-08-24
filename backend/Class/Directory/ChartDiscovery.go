@@ -31,8 +31,12 @@ func Discovery() {
 		Logger.Raise(err.Error())
 	}
 
+	// 0. Get all charts in db to him with charts in directory
+	chartsRows, _ := Database.GetALlChartsOrderedByName()
+	chartsInDB := Utils.ParserRowsToChartDTO(chartsRows)
+
 	// 1. Check for deleted chart file
-	checkRemovedChartFile(files)
+	//checkRemovedChartFile(files)
 
 	Logger.Info("Discovering charts - Check for new/updated chart")
 
@@ -44,7 +48,7 @@ func Discovery() {
 				Logger.Error("Unable to open tar archive")
 				Logger.Raise(err.Error())
 			}
-			defer archive.Close()
+			//defer archive.Close()
 
 			uncompressedFile, err := gzip.NewReader(archive)
 			tarReader := tar.NewReader(uncompressedFile)
@@ -53,12 +57,11 @@ func Discovery() {
 			for {
 				header, err := tarReader.Next()
 				if err == io.EOF {
-					Logger.Error(err.Error())
 					break
 				}
 				if header.Typeflag == tar.TypeReg {
 					if IsChartFile(Utils.GetFilenameFromPath(header.Name)) {
-						// 4. Extract chart infos from chart YAML file
+						// 4. Extract chart infos from the chart YAML file
 						var buf bytes.Buffer
 						if _, err := io.Copy(&buf, tarReader); err != nil {
 							Logger.Error("Error when reading Chart.yaml file")
@@ -71,26 +74,26 @@ func Discovery() {
 						}
 
 						// 5. Create the DTO entity with the data from file
-						path := Utils.GenerateChartPath(Utils.GetFilenameFromPath(file.Name()))
+						path := Utils.GenerateChartPath(file.Name())
 						var dto = Utils.ParserChartToDTO(dataFile, path)
 
 						// 6. Check if chart already exist in the database
-						// TODO: Bug reported => duplicate chart in db
-						if Database.IfChartExist(dto) {
-							// 7.a Update chart in db
-							var chartId = Utils.ParserRowToChartDTO(Database.GetChartByCriteria(dto)).Id
-							Database.UpdateChart(chartId, dto)
-
+						isExist, existChartId := Utils.IsChartAlreadyExist(chartsInDB, dto)
+						fmt.Println(isExist)
+						fmt.Println(existChartId)
+						if isExist {
+							// 7.a Update chart because if already exist
+							Logger.Info("Update chart")
+							Database.UpdateChart(existChartId, dto)
 						} else {
 							// 7.b Insert to the database
+							Logger.Info("Insert chart")
 							Database.InsertChart(dto)
 						}
-
 						break
 					}
 				}
 			}
-
 		}
 	}
 }

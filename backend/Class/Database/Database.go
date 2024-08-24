@@ -50,8 +50,7 @@ func CreateTableCharts() {
 			digest TEXT NOT NULL,
 			path TEXT NULL,
 			home TEXT NULL,
-			sources TEXT NULL,
-			urls TEXT NULL
+			sources TEXT NULL
 		);
 	`
 
