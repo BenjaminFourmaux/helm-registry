@@ -2,6 +2,7 @@ package Api
 
 import (
 	"backend/Class/Database"
+	"backend/Class/Logger"
 	"backend/Entity"
 	"encoding/json"
 	"fmt"
@@ -12,6 +13,12 @@ import (
 func EndpointBFFHome() {
 	http.HandleFunc("/bff/home", func(w http.ResponseWriter, req *http.Request) {
 		traceRequest(req)
+
+		if req.URL.Path != "/bff/home" {
+			Logger.Warning("404 not found")
+			http.NotFound(w, req)
+			return
+		}
 
 		var infoDTO Entity.RegistryDTO
 
@@ -29,12 +36,17 @@ func EndpointBFFHome() {
 		}
 
 		response := Entity.BffHomeResponse{
-			Name:          infoDTO.Name,
-			Description:   infoDTO.Description,
-			Maintainer:    infoDTO.Maintainer,
-			MaintainerUrl: infoDTO.MaintainerUrl,
-			Labels:        strings.Split(infoDTO.Labels, ";"),
+			Name:          infoDTO.Name.String,
+			Description:   infoDTO.Description.String,
+			Maintainer:    infoDTO.Maintainer.String,
+			MaintainerUrl: infoDTO.MaintainerUrl.String,
 			NumberOfRepos: count,
+		}
+
+		if infoDTO.Labels.Valid {
+			response.Labels = strings.Split(infoDTO.Labels.String, ";")
+		} else {
+			response.Labels = []string{}
 		}
 
 		w.Header().Set("Content-Type", "application/json")

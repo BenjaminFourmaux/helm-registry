@@ -41,7 +41,7 @@ func UpdateIndex() {
 		var entry Entity.ChartDTO
 
 		if err := rows.Scan(&entry.Id, &entry.Name, &entry.Description, &entry.Version, &entry.Created, &entry.Digest,
-			&entry.Home, &entry.Sources, &entry.Urls); err != nil {
+			&entry.Path, &entry.Home, &entry.Sources); err != nil {
 			Logger.Error("Deserialization data -> dto")
 		}
 
@@ -54,7 +54,6 @@ func UpdateIndex() {
 			Digest:      entry.Digest,
 			Home:        Utils.NullToString(entry.Home),
 			Sources:     strings.Split(Utils.NullToString(entry.Sources), ";"),
-			Urls:        strings.Split(entry.Urls, ";"),
 		}
 
 		// Add entry in file content
@@ -108,6 +107,7 @@ func CheckChange(oldYaml *Entity.Index, newYaml *Entity.Index) bool {
 
 // IsTGZArchive Return true if the file (or path+file) extension is .tgz
 func IsTGZArchive(path string) bool {
+	// TODO: Panic error if not a really .tgz file (.zip impostor). Maybe more verification
 	return filepath.Ext(path) == ".tgz"
 }
 

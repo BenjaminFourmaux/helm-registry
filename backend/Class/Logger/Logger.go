@@ -53,7 +53,7 @@ func Welcome() {
 	println("Ahoy!")
 	println("A simple Helm chart registry")
 	println()
-	println("Version :", "1.0.0")
+	println("Version :", "1.5.0")
 	println()
 	Info("App is going to start ...")
 }

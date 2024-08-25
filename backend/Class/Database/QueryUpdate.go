@@ -10,7 +10,6 @@ func UpdateChart(id int, chart Entity.ChartDTO) {
 	    created = @created,
 	    home = @home,
 	    sources = @sources,
-	    urls = @urls
 		WHERE id = @id
-	`, chart.Description, chart.Digest, chart.Created, chart.Home, chart.Sources, chart.Urls, id)
+	`, chart.Description, chart.Digest, chart.Created, chart.Home, chart.Sources, id)
 }

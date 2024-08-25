@@ -25,7 +25,7 @@ func CreateTableRegistry() {
 		CREATE TABLE IF NOT EXISTS registry (
 		    name TEXT NULL,
 		    description TEXT NULL,
-		    version INT NULL,
+		    version TEXT NULL,
 		    maintainer TEXT NULL,
 		    maintainer_url TEXT NULL,
 		    labels TEXT NULL
@@ -48,9 +48,9 @@ func CreateTableCharts() {
 			version TEXT NOT NULL,
 			created DATETIME NOT NULL,
 			digest TEXT NOT NULL,
+			path TEXT NULL,
 			home TEXT NULL,
-			sources TEXT NULL,
-			urls TEXT NULL
+			sources TEXT NULL
 		);
 	`
 
@@ -68,7 +68,7 @@ func Fixtures() {
 
 	insertFixturesSQL := `
 		INSERT INTO charts (
-			id, name, description, version, created, digest, home, sources, urls                 
+			id, name, description, version, created, digest, home, sources, path                 
 		) 
 		VALUES (
 			1, 'test', 'Deploy a basic test pod' , '0.1.0', 
@@ -76,7 +76,7 @@ func Fixtures() {
 		    'https://helm.sh/helm', 'https://github.com/helm/helm', 'charts/test/test-0.1.0.tgz' 
 		);
 		INSERT INTO charts (
-			id, name, description, version, created, digest, home, sources, urls                 
+			id, name, description, version, created, digest, home, sources, path                 
 		) 
 		VALUES (
 			2, 'test', 'Deploy a basic test pod' , '0.2.0', 
@@ -84,7 +84,7 @@ func Fixtures() {
 		    'https://helm.sh/helm', 'https://github.com/helm/helm', 'charts/test/test-0.2.0.tgz' 
 		);
 		INSERT INTO charts (
-			id, name, description, version, created, digest, home, sources, urls                 
+			id, name, description, version, created, digest, home, sources, path                 
 		) 
 		VALUES (
 			3, 'toto', 'Deploy a basic toto pod' , '1.1.0', 

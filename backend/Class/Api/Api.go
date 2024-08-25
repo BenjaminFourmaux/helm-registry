@@ -33,6 +33,12 @@ func EndpointTest() {
 	http.HandleFunc("/test", func(w http.ResponseWriter, req *http.Request) {
 		traceRequest(req)
 
+		if req.URL.Path != "/test" {
+			Logger.Warning("404 not found")
+			http.NotFound(w, req)
+			return
+		}
+
 		var filename = Utils.GetFilenameFromPath("./charts/test-nginx-1.0.0.tgz")
 		Logger.Debug(filename)
 
@@ -51,6 +57,12 @@ func EndpointTest() {
 
 func EndpointHelpRedirect() {
 	http.HandleFunc("/help", func(w http.ResponseWriter, req *http.Request) {
+		if req.URL.Path != "/help" {
+			Logger.Warning("404 not found")
+			http.NotFound(w, req)
+			return
+		}
+
 		http.Redirect(w, req, "https://helm.sh/docs/helm/helm_repo/", http.StatusSeeOther)
 	})
 }
@@ -58,6 +70,13 @@ func EndpointHelpRedirect() {
 func EndpointRoot() {
 	http.HandleFunc("/", func(w http.ResponseWriter, req *http.Request) {
 		traceRequest(req)
+
+		if req.URL.Path != "/" {
+			Logger.Warning("404 not found")
+			http.NotFound(w, req)
+			return
+		}
+
 		var infoDTO Entity.RegistryDTO
 
 		w.Header().Set("Content-Type", "text/yaml")
@@ -71,12 +90,12 @@ func EndpointRoot() {
 			ApiVersion: "v1",
 			Kind:       "helm/registry",
 			Registry: Entity.InfoRegistryEntity{
-				Name:          infoDTO.Name,
-				Description:   infoDTO.Description,
-				Version:       infoDTO.Version,
-				Maintainer:    infoDTO.Maintainer,
-				MaintainerUrl: infoDTO.MaintainerUrl,
-				Labels:        strings.Split(infoDTO.Labels, ";"),
+				Name:          infoDTO.Name.String,
+				Description:   infoDTO.Description.String,
+				Version:       infoDTO.Version.String,
+				Maintainer:    infoDTO.Maintainer.String,
+				MaintainerUrl: infoDTO.MaintainerUrl.String,
+				Labels:        strings.Split(infoDTO.Labels.String, ";"),
 			},
 		}
 
@@ -95,6 +114,12 @@ func EndpointIndexYAML() {
 
 	http.HandleFunc("/index.yaml", func(w http.ResponseWriter, req *http.Request) {
 		traceRequest(req)
+
+		if req.URL.Path != "/index.yaml" {
+			Logger.Warning("404 not found")
+			http.NotFound(w, req)
+			return
+		}
 
 		w.Header().Set("Content-Type", "text/yaml")
 
@@ -115,6 +140,13 @@ func EndpointCharts() {
 
 	http.HandleFunc("/charts/", func(w http.ResponseWriter, req *http.Request) {
 		traceRequest(req)
+
+		if !strings.Contains(req.URL.Path, "/charts/") {
+			Logger.Warning("404 not found")
+			http.NotFound(w, req)
+			return
+		}
+
 		http.StripPrefix("/charts/", chartHandler)
 	})
 }
