@@ -1,10 +1,19 @@
 using frontend.Client;
+using frontend.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
+
+// Declare HTTP clients
+builder.Services.AddHttpClient("backendAPI", config =>
+{
+    config.BaseAddress = new Uri("http://localhost:8080/");
+});
+
+builder.Services.AddScoped<BackendAPI>();
 
 // Add BlazorBootstrap service
 builder.Services.AddBlazorBootstrap();

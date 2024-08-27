@@ -1,6 +1,8 @@
 ﻿@page "/"
 @using frontend.Client.Components
 @using frontend.Models
+@using frontend.Services
+@inject BackendAPI BackendAPI
 
 <PageTitle>Home</PageTitle>
 
@@ -8,8 +10,8 @@
     <div class="container-fluid">
         <div class="d-flex flex-column justify-content-center align-items-center">
             <h3>Welcome on</h3>
-            <h2 class="registry-name">My Helm registry</h2>
-            <h5 class="registry-description">A simple Helm registry</h5>
+            <h2 class="registry-name">@homeData.Name</h2>
+            <h5 class="registry-description">@homeData.Description</h5>
         </div>
 
         <hr/>
@@ -18,26 +20,47 @@
             <div class="col-8">
                 <span><strong>Number of Repositories:</strong></span>
                 <br />
-                <span>@numberOfRepositories</span>
+                <span>@homeData.NumberOfRepos</span>
             </div>
             <div class="col-4 pt-3">
                 <span><strong>Maintainer:</strong></span>
                 <br />
-                <span>Joe Doe</span>
+                @if (homeData.Maintainer != null)
+                {
+                    <span>@homeData.Maintainer</span>
+                }
+                else
+                {
+                    <span><i>No maintainer</i></span>
+                }
             </div>
             <div class="col-8">
                 <span><strong>Labels:</strong></span>
                 <br />
-                <TagInput Tags="@tagsList" />
+                @if (homeData.Labels.Length == 0)
+                {
+                    <span><i>No labels</i></span>
+                }
+                else
+                {
+                    <TagInput Tags="@homeData.ToTagItem()" />
+                }
             </div>
             <div class="col-4 pt-3">
-                <a href="https://google.com/">https://google.com/ &nbsp;<Icon Name="IconName.BoxArrowInUpRight"/></a>
+                @if (homeData.MaintainerUrl != null)
+                {
+                    <a href="@homeData.MaintainerUrl">@homeData.MaintainerUrl <Icon Name="IconName.BoxArrowInUpRight"/></a>
+                }
             </div>
         </div>
     </div>
 </div>
 
 @code {
-    TagItem[] tagsList = new TagItem[] {new TagItem("label1", "secondary"), new TagItem("label2", "info")};
-    int numberOfRepositories = 15;
+    private BackendAPIHomeResponse homeData = new BackendAPIHomeResponse();
+
+    protected override async Task OnInitializedAsync()
+    {
+        homeData = await BackendAPI.GetHomeData();
+    }
 }
