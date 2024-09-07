@@ -42,7 +42,7 @@ func ParserRowsToChartDTO(rows *sql.Rows) []Entity.ChartDTO {
 
 		if err != nil {
 			Logger.Error("To parse SQL row in a DTO object")
-			Logger.Raise(err.Error())
+			Logger.Raise(err)
 		}
 
 		list = append(list, dto)
@@ -68,7 +68,7 @@ func ParserRowToChartDTO(row *sql.Row) Entity.ChartDTO {
 
 	if err != nil {
 		Logger.Error("To parse SQL row in a DTO object")
-		Logger.Raise(err.Error())
+		Logger.Raise(err)
 	}
 
 	return dto

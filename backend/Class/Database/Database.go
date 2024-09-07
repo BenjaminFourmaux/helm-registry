@@ -35,7 +35,7 @@ func CreateTableRegistry() {
 	_, err := DB.Exec(createTableSQL)
 	if err != nil {
 		Logger.Error("Fail to create table 'registry'")
-		Logger.Raise(err.Error())
+		Logger.Raise(err)
 	}
 }
 
@@ -57,7 +57,7 @@ func CreateTableCharts() {
 	_, err := DB.Exec(createTableSQL)
 	if err != nil {
 		Logger.Error("Fail to create table 'charts'")
-		Logger.Raise(err.Error())
+		Logger.Raise(err)
 	}
 }
 
@@ -96,7 +96,7 @@ func Fixtures() {
 	_, err := DB.Exec(insertFixturesSQL)
 	if err != nil {
 		Logger.Warning("Fail to insert fixtures")
-		Logger.Raise(err.Error())
+		Logger.Raise(err)
 	}
 }
 
@@ -121,6 +121,6 @@ func InitInfo(name string, description string, version string, maintainer string
 	_, err := DB.Exec(insertInfosSQL, name, description, version, maintainer, maintainer_url, labels)
 	if err != nil {
 		Logger.Warning("Fail to insert registry information")
-		Logger.Raise(err.Error())
+		Logger.Raise(err)
 	}
 }

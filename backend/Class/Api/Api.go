@@ -4,7 +4,6 @@ import (
 	"backend/Class/Database"
 	"backend/Class/Directory"
 	"backend/Class/Logger"
-	"backend/Class/Utils"
 	"backend/Class/Utils/env"
 	"backend/Entity"
 	"bytes"
@@ -16,12 +15,10 @@ import (
 )
 
 func StartServer() {
-	port := 8080
-
-	err := http.ListenAndServe(fmt.Sprintf(":%d", port), nil)
+	err := http.ListenAndServe(fmt.Sprintf(":%d", env.Port), nil)
 	if err != nil {
 		Logger.Error("Fail to launch HTTP Server")
-		Logger.Raise(err.Error())
+		Logger.Raise(err)
 	} else {
 		Logger.Success("HTTP Server is on listening")
 	}
@@ -34,17 +31,7 @@ func EndpointTest() {
 	http.HandleFunc("/test", func(w http.ResponseWriter, req *http.Request) {
 		traceRequest(req)
 
-		var filename = Utils.GetFilenameFromPath("./charts/test-nginx-1.0.0.tgz")
-		Logger.Debug(filename)
-
-		chartId := Database.GetChartByFilename(filename)
-		var chartToDelete = Utils.ParserRowToChartDTO(chartId)
-		fmt.Println(chartToDelete.Id)
-
-		_, err := Database.DeleteChart(chartToDelete.Id)
-		if err != nil {
-			Logger.Raise(err.Error())
-		}
+		Directory.UpdateIndex()
 
 		io.WriteString(w, "Hello, Test !\n")
 	})
@@ -111,7 +98,7 @@ func EndpointIndexYAML() {
 }
 
 func EndpointCharts() {
-	chartDir := env.CHARTS_DIR
+	chartDir := env.REPOSITORY_DIR
 	chartHandler := http.FileServer(http.Dir(chartDir))
 
 	http.HandleFunc("/charts/", func(w http.ResponseWriter, req *http.Request) {

@@ -24,10 +24,10 @@ import (
 func Discovery() {
 	Logger.Info("Discovering charts")
 
-	files, err := os.ReadDir(env.CHARTS_DIR)
+	files, err := os.ReadDir(env.REPOSITORY_DIR)
 	if err != nil {
 		Logger.Error("Unable to open Charts Directory")
-		Logger.Raise(err.Error())
+		Logger.Raise(err)
 	}
 
 	// 1. Check for deleted chart file
@@ -38,10 +38,10 @@ func Discovery() {
 	for _, file := range files {
 		if !file.IsDir() && IsTGZArchive(file.Name()) {
 			// 2. Open .tgz archive
-			archive, err := os.Open(filepath.Join(env.CHARTS_DIR, file.Name()))
+			archive, err := os.Open(filepath.Join(env.REPOSITORY_DIR, file.Name()))
 			if err != nil {
 				Logger.Error("Unable to open tar archive")
-				Logger.Raise(err.Error())
+				Logger.Raise(err)
 			}
 			defer archive.Close()
 
@@ -101,7 +101,7 @@ func RepositoryDirectoryWatcher() {
 	}
 
 	// Add the watching folder
-	err = watcher.Add(env.CHARTS_DIR)
+	err = watcher.Add(env.REPOSITORY_DIR)
 
 	// Trigger event
 	go func() {
@@ -189,7 +189,7 @@ func checkRemovedChartFile(files []os.DirEntry) {
 	err := Database.DeleteCharts(chartsIdToDelete)
 	if err != nil {
 		Logger.Error("When deleted removed charts")
-		Logger.Raise(err.Error())
+		Logger.Raise(err)
 	}
 }
 

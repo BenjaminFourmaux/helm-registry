@@ -2,82 +2,46 @@ package Directory
 
 import (
 	"archive/tar"
-	"backend/Class/Database"
 	"backend/Class/Logger"
-	"backend/Class/Utils"
 	"backend/Class/Utils/env"
 	"backend/Entity"
 	"fmt"
-	"gopkg.in/yaml.v2"
+	"helm.sh/helm/v3/pkg/cli"
+	"helm.sh/helm/v3/pkg/repo"
 	"io"
 	"os"
 	"path/filepath"
 	"reflect"
-	"strings"
 	"time"
 )
 
-func UpdateIndex() {
-	filePath := env.INDEX_FILE_PATH
+var settingsCli *cli.EnvSettings
+var entryCfg repo.Entry
+var indexFile *repo.IndexFile
 
-	Logger.Info("Updating Index")
+func Init() {
+	Logger.Info("Init Directory manager")
 
-	// Step 1. Get registry info from Database
-	rows, errSql := Database.GetALlChartsOrderedByName()
-	if errSql != nil {
-		Logger.Error("Unable to get data from Database")
-	}
+	settingsCli = cli.New()
 
-	// Step 2. Build the file
-	index := Entity.Index{
-		APIVersion: "v1",
-		Entries:    make(map[string][]Entity.ChartEntry),
-		Generated:  time.Now(),
-	}
-
-	// Step 3. Foreach rows
-	// TODO: refactor to use a PARSER from Utils
-	for rows.Next() {
-		var entry Entity.ChartDTO
-
-		if err := rows.Scan(&entry.Id, &entry.Name, &entry.Description, &entry.Version, &entry.Created, &entry.Digest,
-			&entry.Home, &entry.Sources, &entry.Urls); err != nil {
-			Logger.Error("Deserialization data -> dto")
-		}
-
-		// Create entry
-		chartEntry := Entity.ChartEntry{
-			Version:     entry.Version,
-			Created:     entry.Created,
-			Name:        entry.Name,
-			Description: Utils.NullToString(entry.Description),
-			Digest:      entry.Digest,
-			Home:        Utils.NullToString(entry.Home),
-			Sources:     strings.Split(Utils.NullToString(entry.Sources), ";"),
-			Urls:        strings.Split(entry.Urls, ";"),
-		}
-
-		// Add entry in file content
-		index.Entries[entry.Name] = append(index.Entries[entry.Name], chartEntry)
-	}
-
-	// Step 4. Check if change needed
-	yamlFile := &Entity.Index{}
-	err := yaml.Unmarshal(ReadFile(filePath), yamlFile)
+	// Get all charts in REPOSITORY_DIR (/charts), extract their information and build an index
+	indexDir, err := repo.IndexDirectory(env.REPOSITORY_DIR, fmt.Sprintf("%s://%s:%d/charts", env.Scene, env.Hostname, env.Port))
 	if err != nil {
-		Logger.Error("Unable to unmarshal the index file")
+		Logger.Error("When getting charts")
+		Logger.Raise(err)
 	}
+	indexFile = indexDir
+}
 
-	if CheckChange(yamlFile, &index) {
-		index.Generated = time.Now()
-		yamlData, _ := yaml.Marshal(&index)
+/*
+UpdateIndex Update index.yaml using Helm SDK
+*/
+func UpdateIndex() {
+	Logger.Info("Updating index.yaml file")
 
-		// Step 5. Save index YAML file
-		SaveFile(filePath, yamlData)
-
-		Logger.Success("Index successfully updated")
-	} else {
-		Logger.Info("Index - No change needed")
+	err := indexFile.WriteFile(env.INDEX_FILE_PATH, os.FileMode(0777))
+	if err != nil {
+		Logger.Raise(err)
 	}
 }
 
