@@ -6,7 +6,6 @@ import (
 	"backend/Class/Utils/env"
 	"backend/Entity"
 	"fmt"
-	"helm.sh/helm/v3/pkg/cli"
 	"helm.sh/helm/v3/pkg/repo"
 	"io"
 	"os"
@@ -15,32 +14,22 @@ import (
 	"time"
 )
 
-var settingsCli *cli.EnvSettings
-var entryCfg repo.Entry
-var indexFile *repo.IndexFile
-
-func Init() {
-	Logger.Info("Init Directory manager")
-
-	settingsCli = cli.New()
-
-	// Get all charts in REPOSITORY_DIR (/charts), extract their information and build an index
-	indexDir, err := repo.IndexDirectory(env.REPOSITORY_DIR, fmt.Sprintf("%s://%s:%d/charts", env.Scene, env.Hostname, env.Port))
-	if err != nil {
-		Logger.Error("When getting charts")
-		Logger.Raise(err)
-	}
-	indexFile = indexDir
-}
-
 /*
 UpdateIndex Update index.yaml using Helm SDK
 */
 func UpdateIndex() {
 	Logger.Info("Updating index.yaml file")
 
-	err := indexFile.WriteFile(env.INDEX_FILE_PATH, os.FileMode(0777))
+	// Get all charts in REPOSITORY_DIR (/charts), extract their information and build an index
+	indexFile, err := repo.IndexDirectory(env.REPOSITORY_DIR, fmt.Sprintf("%s://%s:%d/charts", env.Scene, env.Hostname, env.Port))
 	if err != nil {
+		Logger.Error("When getting charts")
+		Logger.Raise(err)
+	}
+
+	err = indexFile.WriteFile(env.INDEX_FILE_PATH, os.FileMode(0777))
+	if err != nil {
+		Logger.Error("Writing index.yaml file")
 		Logger.Raise(err)
 	}
 }
