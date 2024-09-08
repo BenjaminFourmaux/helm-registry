@@ -1,26 +1,22 @@
 package Directory
 
 import (
-	"archive/tar"
 	"backend/Class/Database"
 	"backend/Class/Logger"
 	"backend/Class/Utils"
 	"backend/Class/Utils/env"
-	"backend/Entity"
-	"bytes"
-	"compress/gzip"
 	"fmt"
 	"github.com/fsnotify/fsnotify"
-	"gopkg.in/yaml.v2"
 	"helm.sh/helm/v3/pkg/chart/loader"
-	"io"
 	"os"
 	"path/filepath"
 	"strconv"
 )
 
-// Discovery Browse all compressed file in the charts directory and check if all charts are in database.
-// Otherwise, add them
+/*
+Discovery Browse all compressed file in the charts directory and check if all charts are in database.
+Otherwise, add them
+*/
 func Discovery() {
 	Logger.Info("Discovering charts")
 
@@ -35,7 +31,7 @@ func Discovery() {
 	checkRemovedChartFile(files)
 
 	// 2. Get all charts in db to him with charts in directory
-	chartsRows, _ := Database.GetALlChartsOrderedByName()
+	chartsRows, _ := Database.GetAllCharts()
 	chartsInDB := Utils.ParserRowsToChartDTO(chartsRows)
 
 	// 3. Browse zip file content
@@ -56,20 +52,14 @@ func Discovery() {
 			chartDigest := GetDigestFromIndexFile(chartInDir)
 
 			// 4. Check if chartInDir is a newer chart from the db
-			if len(chartsInDB) > 0 {
-				for _, chartInDB := range chartsInDB {
-					if chartInDir.Name() == chartInDB.Name && chartInDir.Metadata.Version == chartInDB.Version {
-						// Chart already exist in db. Check for changes
-						if chartDigest != chartInDB.Digest {
-							// Need update chart
-							chartDTO := Utils.ParserChartToDTO(chartInDir, chartDigest, path)
-							Database.UpdateChart(chartInDB.Id, chartDTO)
-						}
-					} else {
-						// Insert chart in db
-						chartDTO := Utils.ParserChartToDTO(chartInDir, chartDigest, path)
-						Database.InsertChart(chartDTO)
-					}
+			Logger.Debug(strconv.Itoa(len(chartsInDB)))
+			if IsOnList(chartInDir, chartsInDB) {
+				// Chart already exist in db. Check for changes
+				chartInDB := GetOnList(chartInDir, chartsInDB)
+				if chartDigest != chartInDB.Digest {
+					// Need update chart
+					chartDTO := Utils.ParserChartToDTO(chartInDir, chartDigest, path)
+					Database.UpdateChart(chartInDB.Id, chartDTO)
 				}
 			} else {
 				// The database is empty, add the chart
@@ -80,7 +70,9 @@ func Discovery() {
 	}
 }
 
-// RepositoryDirectoryWatcher Initialize the Directory Watcher Listener and call appropriate functions when Events throw
+/*
+RepositoryDirectoryWatcher Initialize the Directory Watcher Listener and call appropriate functions when Events throw
+*/
 func RepositoryDirectoryWatcher() {
 	// Create a Watcher
 	watcher, err := fsnotify.NewWatcher()
@@ -114,7 +106,9 @@ func RepositoryDirectoryWatcher() {
 	}()
 }
 
-// actionTrigger Chose an action by the event operation
+/*
+actionTrigger Chose an action by the event operation
+*/
 func actionTrigger(event fsnotify.Event) {
 	switch event.Op.String() {
 	case "CREATE":
@@ -132,8 +126,10 @@ func actionTrigger(event fsnotify.Event) {
 	UpdateIndex()
 }
 
-// checkRemovedChartFile Browse all files of the charts directory, get only .tgz file and add them into a list of file
-// name and check if in the db, all charts entry has equivalent in directory. Otherwise, delete him
+/*
+checkRemovedChartFile Browse all files of the charts directory, get only .tgz file and add them into a list of file
+name and check if in the db, all charts entry has equivalent in directory. Otherwise, delete him
+*/
 func checkRemovedChartFile(files []os.DirEntry) {
 	Logger.Info("Discovering charts - Check for removed chart files")
 
@@ -174,7 +170,9 @@ func checkRemovedChartFile(files []os.DirEntry) {
 	}
 }
 
-// insertDBFromNewFile Send to BD info of a new chart creating in the repository directory
+/*
+insertDBFromNewFile Send to BD info of a new chart creating in the repository directory
+*/
 func insertDBFromNewFile(filepath string) {
 	// Open tar archive
 	file, err := os.Open(Utils.ConvertWindowsPathToUnix(filepath))
@@ -185,53 +183,24 @@ func insertDBFromNewFile(filepath string) {
 
 	defer file.Close()
 
-	// uncompressed file
-	uncompressedFile, err := gzip.NewReader(file)
+	chartInDir, err := loader.LoadArchive(file)
 	if err != nil {
-		Logger.Error("Error uncompressed archive file")
+		// If the file is not a chart archive, err must be "not a chart archive"
+		Logger.Raise(err)
+		return
 	}
 
-	// Create the archive reader
-	tarReader := tar.NewReader(uncompressedFile)
+	path := Utils.GenerateChartPath(file.Name())
+	chartDigest := GetDigestFromIndexFile(chartInDir)
 
-	// Check if is a Helm Chart package
-	//if !IsAChartPackage(tarReader) {
-	//return
-	//}
-
-	// Browse archive
-	for {
-		header, err := tarReader.Next()
-		if err == io.EOF {
-			break
-		}
-		if header.Typeflag == tar.TypeReg {
-			if IsChartFile(Utils.GetFilenameFromPath(header.Name)) {
-				// Read the content of the file and unmarshal it in yaml format
-				var buf bytes.Buffer
-				if _, err := io.Copy(&buf, tarReader); err != nil {
-					Logger.Error("Error when reading Chart.yaml file")
-					return
-				}
-				var dataFile Entity.ChartFile
-				err := yaml.Unmarshal(buf.Bytes(), &dataFile)
-				if err != nil {
-					Logger.Error("Error in the YAML file, unable to deserialize it")
-				}
-
-				// Create the DTO entity with the data from file
-				//urls := Utils.GenerateChartUrls(Utils.GetFilenameFromPath(file.Name()))
-				//var dto = Utils.ParserChartToDTO(dataFile, urls)
-
-				// Insert to the database
-				//Database.InsertChart(dto)
-				break
-			}
-		}
-	}
+	// Insert chart in db
+	chartDTO := Utils.ParserChartToDTO(chartInDir, chartDigest, path)
+	Database.InsertChart(chartDTO)
 }
 
-// deleteDBFromRemoveFile Delete on the DB when a .tar file is removed
+/*
+deleteDBFromRemoveFile Delete on the DB when a .tar file is removed
+*/
 func deleteDBFromRemoveFile(filepath string) {
 	result := Database.GetChartByFilename(Utils.GetFilenameFromPath(filepath))
 

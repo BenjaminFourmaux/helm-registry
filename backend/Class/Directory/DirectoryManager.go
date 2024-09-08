@@ -68,7 +68,9 @@ func SaveFile(filePath string, data []byte) {
 	}
 }
 
-// CheckChange Compare oldYaml with newYaml and return true if there are a change
+/*
+CheckChange Compare oldYaml with newYaml and return true if there are a change
+*/
 func CheckChange(oldYaml *Entity.Index, newYaml *Entity.Index) bool {
 	// Remove 'generated' field
 	oldYaml.Generated = time.Time{}
@@ -77,12 +79,16 @@ func CheckChange(oldYaml *Entity.Index, newYaml *Entity.Index) bool {
 	return !reflect.DeepEqual(*oldYaml, *newYaml)
 }
 
-// IsTGZArchive Return true if the file (or path+file) extension is .tgz
+/*
+IsTGZArchive Return true if the file (or path+file) extension is .tgz
+*/
 func IsTGZArchive(path string) bool {
 	return filepath.Ext(path) == ".tgz"
 }
 
-// IsAChartPackage Check if in the zip has the requirement to be a Helm Chart (Chart.yaml)
+/*
+IsAChartPackage Check if in the zip has the requirement to be a Helm Chart (Chart.yaml)
+*/
 func IsAChartPackage(fileReader *tar.Reader) bool {
 	fmt.Println(fileReader)
 	for {
@@ -99,12 +105,16 @@ func IsAChartPackage(fileReader *tar.Reader) bool {
 	return false
 }
 
-// IsChartFile Return true if the filename match with Helm chart file naming rule
+/*
+IsChartFile Return true if the filename match with Helm chart file naming rule
+*/
 func IsChartFile(filename string) bool {
 	return filename == "Chart.yaml" || filename == "Chart.yml" || filename == "chart.yaml" || filename == "chart.yml"
 }
 
-// IsFilenameInDirectoryFiles Return true if the filename is on the directory (list of present filename)
+/*
+IsFilenameInDirectoryFiles Return true if the filename is on the directory (list of present filename)
+*/
 func IsFilenameInDirectoryFiles(filename string, list []string) bool {
 	for _, item := range list {
 		if item == filename {
@@ -112,4 +122,28 @@ func IsFilenameInDirectoryFiles(filename string, list []string) bool {
 		}
 	}
 	return false
+}
+
+/*
+IsOnList Search on ChartDTO list if a chart from file exist
+*/
+func IsOnList(chart *chart.Chart, list []Entity.ChartDTO) bool {
+	for _, item := range list {
+		if item.Name == chart.Name() && item.Version == chart.Metadata.Version {
+			return true
+		}
+	}
+	return false
+}
+
+/*
+GetOnList Get on ChartDTO list match chart
+*/
+func GetOnList(chart *chart.Chart, list []Entity.ChartDTO) Entity.ChartDTO {
+	for _, item := range list {
+		if item.Name == chart.Name() && item.Version == chart.Metadata.Version {
+			return item
+		}
+	}
+	return Entity.ChartDTO{}
 }

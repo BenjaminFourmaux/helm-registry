@@ -32,7 +32,7 @@ func main() {
 	// Charts discovery
 	Directory.UpdateIndex()
 	Directory.Discovery()
-	//Directory.RepositoryDirectoryWatcher()
+	Directory.RepositoryDirectoryWatcher()
 
 	// Endpoints registration
 	Logger.Info("Registering HTTP Endpoints")
