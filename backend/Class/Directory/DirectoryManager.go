@@ -6,6 +6,7 @@ import (
 	"backend/Class/Utils/env"
 	"backend/Entity"
 	"fmt"
+	"helm.sh/helm/v3/pkg/chart"
 	"helm.sh/helm/v3/pkg/repo"
 	"io"
 	"os"
@@ -32,6 +33,23 @@ func UpdateIndex() {
 		Logger.Error("Writing index.yaml file")
 		Logger.Raise(err)
 	}
+}
+
+/*
+GetDigestFromIndexFile Get index information from REPOSITORY_DIR and get digest from selected chart
+*/
+func GetDigestFromIndexFile(chart *chart.Chart) string {
+	indexFile, err := repo.IndexDirectory(env.REPOSITORY_DIR, fmt.Sprintf("%s://%s:%d/charts", env.Scene, env.Hostname, env.Port))
+	if err != nil {
+		Logger.Error("When getting charts")
+		Logger.Raise(err)
+	}
+
+	if indexFile.Has(chart.Name(), chart.Metadata.Version) {
+		indexInfo, _ := indexFile.Get(chart.Name(), chart.Metadata.Version)
+		return indexInfo.Digest
+	}
+	return ""
 }
 
 func ReadFile(filePath string) []byte {

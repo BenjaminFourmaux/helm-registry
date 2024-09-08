@@ -10,7 +10,7 @@ type ChartEntry struct {
 	Digest      string    `yaml:"digest"`
 	Home        string    `yaml:"home"`
 	Sources     []string  `yaml:"sources"`
-	Urls        []string  `yaml:"urls"`
+	Path        string    `yaml:"urls"`
 }
 
 type Index struct {

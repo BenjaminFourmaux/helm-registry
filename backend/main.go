@@ -30,11 +30,9 @@ func main() {
 	//Database.Fixtures() // Insert test fixtures
 
 	// Charts discovery
-	//Directory.Discovery()
-	//Directory.RepositoryDirectoryWatcher()
-
-	// Update file
 	Directory.UpdateIndex()
+	Directory.Discovery()
+	//Directory.RepositoryDirectoryWatcher()
 
 	// Endpoints registration
 	Logger.Info("Registering HTTP Endpoints")

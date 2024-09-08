@@ -14,8 +14,6 @@ func GetFilenameFromPath(path string) string {
 	return filepath.Base(ConvertWindowsPathToUnix(path))
 }
 
-func GenerateChartUrls(filename string) []string {
-	return []string{
-		"/charts/" + filename,
-	}
+func GenerateChartPath(filename string) string {
+	return "/charts/" + filename
 }
