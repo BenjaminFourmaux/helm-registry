@@ -3,7 +3,7 @@ entries:
   test-chart:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2024-09-08T17:13:58.440737+02:00"
+    created: "2024-09-15T00:06:34.1242799+02:00"
     description: Test chart
     digest: 8b6852addbdefa6bcdab75027fd06b173edf4bd87637bc904e7f71fa506364a0
     name: test-chart
@@ -14,7 +14,7 @@ entries:
   test-nginx:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2024-09-08T17:13:58.4417402+02:00"
+    created: "2024-09-15T00:06:34.1242799+02:00"
     description: A Helm chart for Kubernetes
     digest: 2704c2d486b02d95020854237a7f997319acee4374542b622a11428620ce0f8f
     name: test-nginx
@@ -22,4 +22,4 @@ entries:
     urls:
     - http://localhost:8080/charts/test-nginx-1.0.0.tgz
     version: 1.0.0
-generated: "2024-09-08T17:13:58.4397383+02:00"
+generated: "2024-09-15T00:06:34.1224693+02:00"
