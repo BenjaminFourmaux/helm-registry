@@ -52,7 +52,6 @@ func Discovery() {
 			chartDigest := GetDigestFromIndexFile(chartInDir)
 
 			// 4. Check if chartInDir is a newer chart from the db
-			Logger.Debug(strconv.Itoa(len(chartsInDB)))
 			if IsOnList(chartInDir, chartsInDB) {
 				// Chart already exist in db. Check for changes
 				chartInDB := GetOnList(chartInDir, chartsInDB)
@@ -66,6 +65,7 @@ func Discovery() {
 				chartDTO := Utils.ParserChartToDTO(chartInDir, chartDigest, path)
 				Database.InsertChart(chartDTO)
 			}
+			defer archive.Close()
 		}
 	}
 }
@@ -123,7 +123,7 @@ func actionTrigger(event fsnotify.Event) {
 		}
 	}
 	// Update index.yaml file after action triggering and database change
-	UpdateIndex()
+	//UpdateIndex()
 }
 
 /*
@@ -181,8 +181,6 @@ func insertDBFromNewFile(filepath string) {
 		return
 	}
 
-	defer file.Close()
-
 	chartInDir, err := loader.LoadArchive(file)
 	if err != nil {
 		// If the file is not a chart archive, err must be "not a chart archive"
@@ -190,19 +188,21 @@ func insertDBFromNewFile(filepath string) {
 		return
 	}
 
-	path := Utils.GenerateChartPath(file.Name())
+	path := Utils.GenerateChartPath(Utils.GetFilenameFromPath(file.Name()))
 	chartDigest := GetDigestFromIndexFile(chartInDir)
 
 	// Insert chart in db
 	chartDTO := Utils.ParserChartToDTO(chartInDir, chartDigest, path)
 	Database.InsertChart(chartDTO)
+
+	defer file.Close()
 }
 
 /*
 deleteDBFromRemoveFile Delete on the DB when a .tar file is removed
 */
 func deleteDBFromRemoveFile(filepath string) {
-	result := Database.GetChartByFilename(Utils.GetFilenameFromPath(filepath))
+	result := Database.GetChartByFilename(Utils.GenerateChartPath(Utils.GetFilenameFromPath(filepath)))
 
 	if result.Err() != nil {
 		Logger.Warning(result.Err().Error())

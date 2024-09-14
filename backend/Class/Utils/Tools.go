@@ -10,6 +10,10 @@ func ConvertWindowsPathToUnix(windowsPath string) string {
 	return strings.Replace(windowsPath, "\\", "/", -1)
 }
 
+/*
+GetFilenameFromPath From a file relative path, get le file name (with extension)
+tested & approved
+*/
 func GetFilenameFromPath(path string) string {
 	return filepath.Base(ConvertWindowsPathToUnix(path))
 }
