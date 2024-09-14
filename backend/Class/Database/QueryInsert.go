@@ -5,7 +5,9 @@ import (
 	. "backend/Entity"
 )
 
-// InsertChart Insert a new chart on the table 'charts'
+/*
+InsertChart Insert a new chart on the table 'charts'
+*/
 func InsertChart(entity ChartDTO) {
 	var sql = `
 		INSERT INTO charts (

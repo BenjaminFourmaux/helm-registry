@@ -1,18 +1,15 @@
 package Directory
 
 import (
-	"archive/tar"
 	"backend/Class/Logger"
 	"backend/Class/Utils/env"
 	"backend/Entity"
 	"fmt"
 	"helm.sh/helm/v3/pkg/chart"
+	"helm.sh/helm/v3/pkg/chart/loader"
 	"helm.sh/helm/v3/pkg/repo"
-	"io"
 	"os"
 	"path/filepath"
-	"reflect"
-	"time"
 )
 
 /*
@@ -69,17 +66,6 @@ func SaveFile(filePath string, data []byte) {
 }
 
 /*
-CheckChange Compare oldYaml with newYaml and return true if there are a change
-*/
-func CheckChange(oldYaml *Entity.Index, newYaml *Entity.Index) bool {
-	// Remove 'generated' field
-	oldYaml.Generated = time.Time{}
-	newYaml.Generated = time.Time{}
-
-	return !reflect.DeepEqual(*oldYaml, *newYaml)
-}
-
-/*
 IsTGZArchive Return true if the file (or path+file) extension is .tgz
 */
 func IsTGZArchive(path string) bool {
@@ -87,22 +73,23 @@ func IsTGZArchive(path string) bool {
 }
 
 /*
-IsAChartPackage Check if in the zip has the requirement to be a Helm Chart (Chart.yaml)
+IsAChartPackage Check if the file is a Chart archive using LoadArchive from Helm SDK
 */
-func IsAChartPackage(fileReader *tar.Reader) bool {
-	fmt.Println(fileReader)
-	for {
-		header, err := fileReader.Next()
-		if err == io.EOF {
-			break
-		}
-		if header.Typeflag == tar.TypeReg {
-			if header.Name == "Chart.yaml" || header.Name == "Chart.yml" {
-				return true
-			}
-		}
+func IsAChartPackage(pathFile string) bool {
+	archive, err := os.Open(pathFile)
+	if err != nil {
+		Logger.Error("Can't open archive")
+		Logger.Raise(err)
+		return false
 	}
-	return false
+
+	_, err = loader.LoadArchive(archive)
+	if err != nil {
+		Logger.Debug(err.Error())
+		return false
+	}
+
+	return true
 }
 
 /*

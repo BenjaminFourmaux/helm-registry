@@ -112,7 +112,7 @@ actionTrigger Chose an action by the event operation
 func actionTrigger(event fsnotify.Event) {
 	switch event.Op.String() {
 	case "CREATE":
-		if IsTGZArchive(event.Name) {
+		if IsTGZArchive(event.Name) && IsAChartPackage(event.Name) {
 			Logger.Info("Action - insert")
 			insertDBFromNewFile(event.Name)
 		}
@@ -123,7 +123,7 @@ func actionTrigger(event fsnotify.Event) {
 		}
 	}
 	// Update index.yaml file after action triggering and database change
-	//UpdateIndex()
+	UpdateIndex()
 }
 
 /*
