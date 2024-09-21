@@ -38,9 +38,7 @@ func EndpointTest() {
 			http.NotFound(w, req)
 			return
 		}
-
-		Directory.UpdateIndex()
-
+		
 		io.WriteString(w, "Hello, Test !\n")
 	})
 }

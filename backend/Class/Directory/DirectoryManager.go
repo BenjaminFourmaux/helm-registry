@@ -84,6 +84,7 @@ func IsAChartPackage(pathFile string) bool {
 	}
 
 	_, err = loader.LoadArchive(archive)
+	defer archive.Close()
 	if err != nil {
 		Logger.Debug(err.Error())
 		return false
