@@ -6,3 +6,8 @@
 
 # Build articfacts directory
 .build
+
+
+# Exclude Backend variables files
+backend/index.yaml
+backend/registry.db

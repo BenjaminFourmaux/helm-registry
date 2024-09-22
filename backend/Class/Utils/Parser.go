@@ -4,26 +4,31 @@ import (
 	"backend/Class/Logger"
 	"backend/Entity"
 	"database/sql"
+	"helm.sh/helm/v3/pkg/chart"
 	"strings"
 	"time"
 )
 
-// ParserChartToDTO Parser ChartFile entity to Chart DTO
-func ParserChartToDTO(entity Entity.ChartFile, urls []string) Entity.ChartDTO {
+/*
+ParserChartToDTO Parser ChartFile entity to Chart DTO
+*/
+func ParserChartToDTO(entity *chart.Chart, digest string, path string) Entity.ChartDTO {
 	var dto = Entity.ChartDTO{
-		Name:        entity.Name,
-		Description: StringToNull(entity.Description),
-		Version:     entity.Version,
+		Name:        entity.Name(),
+		Description: StringToNull(entity.Metadata.Description),
+		Version:     entity.Metadata.Version,
 		Created:     time.Now(),
-		Digest:      "", // TODO : Compute manually the hash via sha-256 algorithm
-		Home:        StringToNull(entity.Home),
-		Sources:     StringToNull(strings.Join(entity.Sources, ";")),
-		Urls:        strings.Join(urls, ";"),
+		Digest:      digest,
+		Home:        StringToNull(entity.Metadata.Home),
+		Sources:     StringToNull(strings.Join(entity.Metadata.Sources, ";")),
+		Path:        StringToNull(path),
 	}
 	return dto
 }
 
-// ParserRowsToChartDTO Parse the result of a DB rows (multiple row result) in a list of ChartDTO
+/*
+ParserRowsToChartDTO Parse the result of a DB rows (multiple row result) in a list of ChartDTO
+*/
 func ParserRowsToChartDTO(rows *sql.Rows) []Entity.ChartDTO {
 	var list []Entity.ChartDTO
 	for rows.Next() {
@@ -37,12 +42,12 @@ func ParserRowsToChartDTO(rows *sql.Rows) []Entity.ChartDTO {
 			&dto.Digest,
 			&dto.Home,
 			&dto.Sources,
-			&dto.Urls,
+			&dto.Path,
 		)
 
 		if err != nil {
 			Logger.Error("To parse SQL row in a DTO object")
-			Logger.Raise(err.Error())
+			Logger.Raise(err)
 		}
 
 		list = append(list, dto)
@@ -51,7 +56,9 @@ func ParserRowsToChartDTO(rows *sql.Rows) []Entity.ChartDTO {
 	return list
 }
 
-// ParserRowToChartDTO Parse the result of a DB row into a ChartDTO
+/*
+ParserRowToChartDTO Parse the result of a DB row into a ChartDTO
+*/
 func ParserRowToChartDTO(row *sql.Row) Entity.ChartDTO {
 	var dto Entity.ChartDTO
 	err := row.Scan(
@@ -63,31 +70,31 @@ func ParserRowToChartDTO(row *sql.Row) Entity.ChartDTO {
 		&dto.Digest,
 		&dto.Home,
 		&dto.Sources,
-		&dto.Urls,
+		&dto.Path,
 	)
 
 	if err != nil {
 		Logger.Error("To parse SQL row in a DTO object")
-		Logger.Raise(err.Error())
+		Logger.Raise(err)
 	}
 
 	return dto
 }
 
-// NullToString Convert a sql.NullString into a string (same empty)
+/*
+NullToString Convert a sql.NullString into a string (same empty)
+*/
 func NullToString(nullString sql.NullString) string {
-	if nullString.Valid {
-		return nullString.String
-	} else {
-		return ""
-	}
+	return nullString.String
 }
 
-// StringToNull Convert a string to a sql.NullString
+/*
+StringToNull Convert a string to a sql.NullString
+*/
 func StringToNull(str string) sql.NullString {
 	if str == "" {
-		return sql.NullString{}
+		return sql.NullString{Valid: false}
 	} else {
-		return sql.NullString{String: str}
+		return sql.NullString{String: str, Valid: true}
 	}
 }

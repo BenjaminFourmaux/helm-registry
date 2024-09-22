@@ -4,7 +4,6 @@ import (
 	"backend/Class/Database"
 	"backend/Class/Directory"
 	"backend/Class/Logger"
-	"backend/Class/Utils"
 	"backend/Class/Utils/env"
 	"backend/Entity"
 	"bytes"
@@ -16,12 +15,12 @@ import (
 )
 
 func StartServer() {
-	port := 8080
+	Logger.Success(fmt.Sprintf("HTTP Server is on listening on port: %d", env.Port))
 
-	err := http.ListenAndServe(fmt.Sprintf(":%d", port), nil)
+	err := http.ListenAndServe(fmt.Sprintf(":%d", env.Port), nil)
 	if err != nil {
 		Logger.Error("Fail to launch HTTP Server")
-		Logger.Raise(err.Error())
+		Logger.Raise(err)
 	} else {
 		Logger.Success("HTTP Server is on listening")
 	}
@@ -34,24 +33,24 @@ func EndpointTest() {
 	http.HandleFunc("/test", func(w http.ResponseWriter, req *http.Request) {
 		traceRequest(req)
 
-		var filename = Utils.GetFilenameFromPath("./charts/test-nginx-1.0.0.tgz")
-		Logger.Debug(filename)
-
-		chartId := Database.GetChartByFilename(filename)
-		var chartToDelete = Utils.ParserRowToChartDTO(chartId)
-		fmt.Println(chartToDelete.Id)
-
-		_, err := Database.DeleteChart(chartToDelete.Id)
-		if err != nil {
-			Logger.Raise(err.Error())
+		if req.URL.Path != "/test" {
+			Logger.Warning("404 not found")
+			http.NotFound(w, req)
+			return
 		}
-
+		
 		io.WriteString(w, "Hello, Test !\n")
 	})
 }
 
 func EndpointHelpRedirect() {
 	http.HandleFunc("/help", func(w http.ResponseWriter, req *http.Request) {
+		if req.URL.Path != "/help" {
+			Logger.Warning("404 not found")
+			http.NotFound(w, req)
+			return
+		}
+
 		http.Redirect(w, req, "https://helm.sh/docs/helm/helm_repo/", http.StatusSeeOther)
 	})
 }
@@ -59,6 +58,13 @@ func EndpointHelpRedirect() {
 func EndpointRoot() {
 	http.HandleFunc("/", func(w http.ResponseWriter, req *http.Request) {
 		traceRequest(req)
+
+		if req.URL.Path != "/" && req.URL.Path != "/favicon.ico" {
+			Logger.Warning("404 not found")
+			http.NotFound(w, req)
+			return
+		}
+
 		var infoDTO Entity.RegistryDTO
 
 		w.Header().Set("Content-Type", "text/yaml")
@@ -97,6 +103,12 @@ func EndpointIndexYAML() {
 	http.HandleFunc("/index.yaml", func(w http.ResponseWriter, req *http.Request) {
 		traceRequest(req)
 
+		if req.URL.Path != "/index.yaml" {
+			Logger.Warning("404 not found")
+			http.NotFound(w, req)
+			return
+		}
+
 		w.Header().Set("Content-Type", "text/yaml")
 
 		// Open index.yaml file
@@ -111,11 +123,18 @@ func EndpointIndexYAML() {
 }
 
 func EndpointCharts() {
-	chartDir := env.CHARTS_DIR
+	chartDir := env.REPOSITORY_DIR
 	chartHandler := http.FileServer(http.Dir(chartDir))
 
 	http.HandleFunc("/charts/", func(w http.ResponseWriter, req *http.Request) {
 		traceRequest(req)
+
+		if !strings.Contains(req.URL.Path, "/charts/") {
+			Logger.Warning("404 not found")
+			http.NotFound(w, req)
+			return
+		}
+
 		http.StripPrefix("/charts/", chartHandler)
 	})
 }

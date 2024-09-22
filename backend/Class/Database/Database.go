@@ -35,7 +35,7 @@ func CreateTableRegistry() {
 	_, err := DB.Exec(createTableSQL)
 	if err != nil {
 		Logger.Error("Fail to create table 'registry'")
-		Logger.Raise(err.Error())
+		Logger.Raise(err)
 	}
 }
 
@@ -50,14 +50,14 @@ func CreateTableCharts() {
 			digest TEXT NOT NULL,
 			home TEXT NULL,
 			sources TEXT NULL,
-			urls TEXT NULL
+			path TEXT NULL
 		);
 	`
 
 	_, err := DB.Exec(createTableSQL)
 	if err != nil {
 		Logger.Error("Fail to create table 'charts'")
-		Logger.Raise(err.Error())
+		Logger.Raise(err)
 	}
 }
 
@@ -68,7 +68,7 @@ func Fixtures() {
 
 	insertFixturesSQL := `
 		INSERT INTO charts (
-			id, name, description, version, created, digest, home, sources, urls                 
+			id, name, description, version, created, digest, home, sources, path                 
 		) 
 		VALUES (
 			1, 'test', 'Deploy a basic test pod' , '0.1.0', 
@@ -76,7 +76,7 @@ func Fixtures() {
 		    'https://helm.sh/helm', 'https://github.com/helm/helm', 'charts/test/test-0.1.0.tgz' 
 		);
 		INSERT INTO charts (
-			id, name, description, version, created, digest, home, sources, urls                 
+			id, name, description, version, created, digest, home, sources, path                 
 		) 
 		VALUES (
 			2, 'test', 'Deploy a basic test pod' , '0.2.0', 
@@ -84,7 +84,7 @@ func Fixtures() {
 		    'https://helm.sh/helm', 'https://github.com/helm/helm', 'charts/test/test-0.2.0.tgz' 
 		);
 		INSERT INTO charts (
-			id, name, description, version, created, digest, home, sources, urls                 
+			id, name, description, version, created, digest, home, sources, path                 
 		) 
 		VALUES (
 			3, 'toto', 'Deploy a basic toto pod' , '1.1.0', 
@@ -96,7 +96,7 @@ func Fixtures() {
 	_, err := DB.Exec(insertFixturesSQL)
 	if err != nil {
 		Logger.Warning("Fail to insert fixtures")
-		Logger.Raise(err.Error())
+		Logger.Raise(err)
 	}
 }
 
@@ -121,6 +121,6 @@ func InitInfo(name string, description string, version string, maintainer string
 	_, err := DB.Exec(insertInfosSQL, name, description, version, maintainer, maintainer_url, labels)
 	if err != nil {
 		Logger.Warning("Fail to insert registry information")
-		Logger.Raise(err.Error())
+		Logger.Raise(err)
 	}
 }

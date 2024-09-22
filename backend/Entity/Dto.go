@@ -14,7 +14,7 @@ type ChartDTO struct {
 	Digest      string         `json:"digest"`
 	Home        sql.NullString `json:"home"`    // nullable string field
 	Sources     sql.NullString `json:"sources"` // nullable string field
-	Urls        string         `json:"urls"`
+	Path        sql.NullString `json:"path"`    // nullable string field
 }
 
 type RegistryDTO struct {
