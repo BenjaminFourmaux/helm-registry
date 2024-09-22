@@ -38,6 +38,12 @@ jobs:
    
     - name: Wait for API to start
       run: sleep 5
+
+    # Install dependencies
+    - name: Install dependencies
+      working-directory: ./test
+      run: |
+        go get github.com/mattn/go-sqlite3
       
     - name: Test
       working-directory: ./test
