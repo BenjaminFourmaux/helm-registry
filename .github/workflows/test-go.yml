@@ -41,8 +41,6 @@ jobs:
       
     - name: Test
       working-directory: ./test
-      run: |
-        cd ./test
-        go test -v test
+      run: go test -v
       env:
         CGO_ENABLED: 1
