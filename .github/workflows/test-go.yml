@@ -40,7 +40,7 @@ jobs:
       run: sleep 5
       
     - name: Test
-      working-directory: ../test
+      working-directory: test
       run: go test -v test
       env:
         CGO_ENABLED: 1
