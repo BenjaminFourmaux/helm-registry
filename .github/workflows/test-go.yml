@@ -38,7 +38,11 @@ jobs:
         REPOSITORY_DIR: "../test/chart"
    
     - name: Wait for API to start
-      run: sleep 5
+      run: |
+        until curl -s http://localhost:8080/; do
+          echo "Waiting for API to be available..."
+          sleep 5
+        done
 
     # Install dependencies
     - name: Install dependencies
