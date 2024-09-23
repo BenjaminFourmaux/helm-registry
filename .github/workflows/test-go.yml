@@ -60,4 +60,4 @@ jobs:
     - name: Export API logs
       run: |
         echo "API Logs:"
-        cat ./backend/api.log  # Affiche les logs dans la sortie de la pipeline
+        cat ./backend/api.log
