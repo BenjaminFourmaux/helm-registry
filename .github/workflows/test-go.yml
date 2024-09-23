@@ -32,7 +32,7 @@ jobs:
     - name: Run
       working-directory: ./backend
       #run: go run .
-      run: nohup go run . &
+      run: nohup go run . > api.log 2>$1 &
       env:
         CGO_ENABLED: 1
         REPOSITORY_DIR: "../test/chart"
@@ -55,3 +55,9 @@ jobs:
       run: go test -v
       env:
         CGO_ENABLED: 1
+
+    # Exporter les logs de l'API
+    - name: Export API logs
+      run: |
+        echo "API Logs:"
+        cat ./backend/api.log  # Affiche les logs dans la sortie de la pipeline
