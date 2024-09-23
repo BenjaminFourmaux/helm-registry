@@ -32,7 +32,7 @@ jobs:
     - name: Run
       working-directory: ./backend
       #run: go run .
-      run: nohup go run . > api.log 2>$1 &
+      run: nohup go run . > api.log 2>&1 &
       env:
         CGO_ENABLED: 1
         REPOSITORY_DIR: "../test/chart"
