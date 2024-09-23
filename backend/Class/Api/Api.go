@@ -4,7 +4,6 @@ import (
 	"backend/Class/Database"
 	"backend/Class/Directory"
 	"backend/Class/Logger"
-	"backend/Class/Utils"
 	"backend/Class/Utils/env"
 	"backend/Entity"
 	"bytes"
@@ -16,15 +15,16 @@ import (
 )
 
 func StartServer() {
-	port := 8080
+	Logger.Success(fmt.Sprintf("HTTP Server is on listening on port: %d", env.Port))
 
-	Logger.Success(fmt.Sprintf("HTTP Server is on listening on port: %d", port))
-
-	err := http.ListenAndServe(fmt.Sprintf(":%d", port), nil)
+	err := http.ListenAndServe(fmt.Sprintf(":%d", env.Port), nil)
 	if err != nil {
 		Logger.Error("Fail to launch HTTP Server")
-		Logger.Raise(err.Error())
+		Logger.Raise(err)
+	} else {
+		Logger.Success("HTTP Server is on listening")
 	}
+
 }
 
 // <editor-fold desc="Endpoints"> Endpoints
@@ -38,19 +38,7 @@ func EndpointTest() {
 			http.NotFound(w, req)
 			return
 		}
-
-		var filename = Utils.GetFilenameFromPath("./charts/test-nginx-1.0.0.tgz")
-		Logger.Debug(filename)
-
-		chartId := Database.GetChartByFilename(filename)
-		var chartToDelete = Utils.ParserRowToChartDTO(chartId)
-		fmt.Println(chartToDelete.Id)
-
-		_, err := Database.DeleteChart(chartToDelete.Id)
-		if err != nil {
-			Logger.Raise(err.Error())
-		}
-
+		
 		io.WriteString(w, "Hello, Test !\n")
 	})
 }
@@ -71,7 +59,7 @@ func EndpointRoot() {
 	http.HandleFunc("/", func(w http.ResponseWriter, req *http.Request) {
 		traceRequest(req)
 
-		if req.URL.Path != "/" {
+		if req.URL.Path != "/" && req.URL.Path != "/favicon.ico" {
 			Logger.Warning("404 not found")
 			http.NotFound(w, req)
 			return
@@ -83,19 +71,19 @@ func EndpointRoot() {
 
 		// Get info from Database and convert it into DTO object
 		data := Database.GetInfo()
-		data.Scan(&infoDTO.Name, &infoDTO.Description, &infoDTO.Version, &infoDTO.Maintainer, &infoDTO.MaintainerUrl, &infoDTO.Labels)
+		data.Scan(infoDTO.Name, infoDTO.Description, infoDTO.Version, infoDTO.Maintainer, infoDTO.MaintainerUrl, infoDTO.Labels)
 
 		// DTO to YAML
 		infoYAML := Entity.InfoEntity{
 			ApiVersion: "v1",
 			Kind:       "helm/registry",
 			Registry: Entity.InfoRegistryEntity{
-				Name:          infoDTO.Name.String,
-				Description:   infoDTO.Description.String,
-				Version:       infoDTO.Version.String,
-				Maintainer:    infoDTO.Maintainer.String,
-				MaintainerUrl: infoDTO.MaintainerUrl.String,
-				Labels:        strings.Split(infoDTO.Labels.String, ";"),
+				Name:          infoDTO.Name,
+				Description:   infoDTO.Description,
+				Version:       infoDTO.Version,
+				Maintainer:    infoDTO.Maintainer,
+				MaintainerUrl: infoDTO.MaintainerUrl,
+				Labels:        strings.Split(infoDTO.Labels, ";"),
 			},
 		}
 
@@ -135,7 +123,7 @@ func EndpointIndexYAML() {
 }
 
 func EndpointCharts() {
-	chartDir := env.CHARTS_DIR
+	chartDir := env.REPOSITORY_DIR
 	chartHandler := http.FileServer(http.Dir(chartDir))
 
 	http.HandleFunc("/charts/", func(w http.ResponseWriter, req *http.Request) {

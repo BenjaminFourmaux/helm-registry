@@ -1,16 +1,17 @@
-package Entity
+package test
 
 import "time"
 
 type ChartEntry struct {
-	Version     string    `yaml:"version"`
+	APIVersion  string    `yaml:"apiVersion"`
+	AppVersion  string    `yaml:"appVersion"`
 	Created     time.Time `yaml:"created"`
-	Name        string    `yaml:"name"`
 	Description string    `yaml:"description"`
 	Digest      string    `yaml:"digest"`
-	Home        string    `yaml:"home"`
-	Sources     []string  `yaml:"sources"`
-	Path        string    `yaml:"urls"`
+	Name        string    `yaml:"name"`
+	Type        string    `yaml:"type"`
+	URLs        []string  `yaml:"urls"`
+	Version     string    `yaml:"version"`
 }
 
 type Index struct {

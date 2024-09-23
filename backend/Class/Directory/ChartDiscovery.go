@@ -1,18 +1,13 @@
 package Directory
 
 import (
-	"archive/tar"
 	"backend/Class/Database"
 	"backend/Class/Logger"
 	"backend/Class/Utils"
 	"backend/Class/Utils/env"
-	"backend/Entity"
-	"bytes"
-	"compress/gzip"
 	"fmt"
 	"github.com/fsnotify/fsnotify"
-	"gopkg.in/yaml.v2"
-	"io"
+	"helm.sh/helm/v3/pkg/chart/loader"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -25,73 +20,52 @@ Otherwise, add them
 func Discovery() {
 	Logger.Info("Discovering charts")
 
-	files, err := os.ReadDir(env.CHARTS_DIR)
+	// 0. Get files from REPOSITORY_DIR
+	files, err := os.ReadDir(env.REPOSITORY_DIR)
 	if err != nil {
 		Logger.Error("Unable to open Charts Directory")
-		Logger.Raise(err.Error())
+		Logger.Raise(err)
 	}
-
-	// 0. Get all charts in db to him with charts in directory
-	chartsRows, _ := Database.GetALlChartsOrderedByName()
-	chartsInDB := Utils.ParserRowsToChartDTO(chartsRows)
 
 	// 1. Check for deleted chart file
 	checkRemovedChartFile(files)
 
-	Logger.Info("Discovering charts - Check for new/updated chart")
+	// 2. Get all charts in db to him with charts in directory
+	chartsRows, _ := Database.GetAllCharts()
+	chartsInDB := Utils.ParserRowsToChartDTO(chartsRows)
 
+	// 3. Browse zip file content
 	for _, file := range files {
 		if !file.IsDir() && IsTGZArchive(file.Name()) {
-			// 2. Open .tgz archive
-			archive, err := os.Open(filepath.Join(env.CHARTS_DIR, file.Name()))
+			archive, err := os.Open(filepath.Join(env.REPOSITORY_DIR, file.Name()))
 			if err != nil {
 				Logger.Error("Unable to open tar archive")
-				Logger.Raise(err.Error())
+				Logger.Raise(err)
 			}
-			//defer archive.Close()
 
-			uncompressedFile, err := gzip.NewReader(archive)
-			tarReader := tar.NewReader(uncompressedFile)
-
-			// 3. Browse zip file content
-			for {
-				header, err := tarReader.Next()
-				if err == io.EOF {
-					break
-				}
-				if header.Typeflag == tar.TypeReg {
-					if IsChartFile(Utils.GetFilenameFromPath(header.Name)) {
-						// 4. Extract chart infos from the chart YAML file
-						var buf bytes.Buffer
-						if _, err := io.Copy(&buf, tarReader); err != nil {
-							Logger.Error("Error when reading Chart.yaml file")
-							return
-						}
-						var dataFile Entity.ChartFile
-						err := yaml.Unmarshal(buf.Bytes(), &dataFile)
-						if err != nil {
-							Logger.Error("Error in the YAML file, unable to deserialize it")
-						}
-
-						// 5. Create the DTO entity with the data from file
-						path := Utils.GenerateChartPath(file.Name())
-						var dto = Utils.ParserChartToDTO(dataFile, path)
-
-						// 6. Check if chart already exist in the database
-						isExist, existChartId := Utils.IsChartAlreadyExist(chartsInDB, dto)
-						if isExist {
-							// 7.a Update chart because if already exist
-							Logger.Info("Update chart")
-							Database.UpdateChart(existChartId, dto)
-						} else {
-							// 7.b Insert to the database
-							Logger.Info("Insert chart")
-							Database.InsertChart(dto)
-						}
-						break
-					}
-				}
+			chartInDir, err := loader.LoadArchive(archive)
+			if err != nil {
+				Logger.Raise(err)
 			}
+
+			path := Utils.GenerateChartPath(file.Name())
+			chartDigest := GetDigestFromIndexFile(chartInDir)
+
+			// 4. Check if chartInDir is a newer chart from the db
+			if IsOnList(chartInDir, chartsInDB) {
+				// Chart already exist in db. Check for changes
+				chartInDB := GetOnList(chartInDir, chartsInDB)
+				if chartDigest != chartInDB.Digest {
+					// Need update chart
+					chartDTO := Utils.ParserChartToDTO(chartInDir, chartDigest, path)
+					Database.UpdateChart(chartInDB.Id, chartDTO)
+				}
+			} else {
+				// The database is empty, add the chart
+				chartDTO := Utils.ParserChartToDTO(chartInDir, chartDigest, path)
+				Database.InsertChart(chartDTO)
+			}
+			defer archive.Close()
 		}
 	}
 }
@@ -107,7 +81,7 @@ func RepositoryDirectoryWatcher() {
 	}
 
 	// Add the watching folder
-	err = watcher.Add(env.CHARTS_DIR)
+	err = watcher.Add(env.REPOSITORY_DIR)
 
 	// Trigger event
 	go func() {
@@ -138,18 +112,26 @@ actionTrigger Chose an action by the event operation
 func actionTrigger(event fsnotify.Event) {
 	switch event.Op.String() {
 	case "CREATE":
-		if IsTGZArchive(event.Name) {
+		if IsTGZArchive(event.Name) && IsAChartPackage(event.Name) {
 			Logger.Info("Action - insert")
-
 			insertDBFromNewFile(event.Name)
-
-			// Update index.yaml file after action triggering and database change
-			UpdateIndex()
 		}
 	case "REMOVE":
 		if IsTGZArchive(event.Name) {
 			Logger.Info("Action - delete")
 			deleteDBFromRemoveFile(event.Name)
+		}
+	case "RENAME":
+		if IsTGZArchive(event.Name) {
+			// Check if file was removed
+			if !IsFileExist(event.Name) {
+				Logger.Info("Action - delete")
+				deleteDBFromRemoveFile(event.Name)
+			} else {
+				// No effect (CREATE trigger before)
+				// This case spawn in GitHub Action Worker (Ubuntu) but not in my pc (Windows)
+				// I think rename is a specific case for Unix folder manager (move via os.rename GO)
+			}
 		}
 	}
 	// Update index.yaml file after action triggering and database change
@@ -181,7 +163,7 @@ func checkRemovedChartFile(files []os.DirEntry) {
 	for _, chart := range listALlChartsDTO {
 		var isOnDirectory = false
 
-		// 4. If file exist
+		// 4. Browse chart's urls
 		if IsFilenameInDirectoryFiles(filepath.Base(Utils.NullToString(chart.Path)), filenames) {
 			isOnDirectory = true
 		}
@@ -196,7 +178,7 @@ func checkRemovedChartFile(files []os.DirEntry) {
 	err := Database.DeleteCharts(chartsIdToDelete)
 	if err != nil {
 		Logger.Error("When deleted removed charts")
-		Logger.Raise(err.Error())
+		Logger.Raise(err)
 	}
 }
 
@@ -211,59 +193,28 @@ func insertDBFromNewFile(filepath string) {
 		return
 	}
 
-	defer file.Close()
-
-	// uncompressed file
-	uncompressedFile, err := gzip.NewReader(file)
+	chartInDir, err := loader.LoadArchive(file)
 	if err != nil {
-		Logger.Error("Error uncompressed archive file")
+		// If the file is not a chart archive, err must be "not a chart archive"
+		Logger.Raise(err)
+		return
 	}
 
-	// Create the archive reader
-	tarReader := tar.NewReader(uncompressedFile)
+	path := Utils.GenerateChartPath(Utils.GetFilenameFromPath(file.Name()))
+	chartDigest := GetDigestFromIndexFile(chartInDir)
 
-	// Check if is a Helm Chart package
-	//if !IsAChartPackage(tarReader) {
-	//return
-	//}
+	// Insert chart in db
+	chartDTO := Utils.ParserChartToDTO(chartInDir, chartDigest, path)
+	Database.InsertChart(chartDTO)
 
-	// Browse archive
-	for {
-		header, err := tarReader.Next()
-		if err == io.EOF {
-			break
-		}
-		if header.Typeflag == tar.TypeReg {
-			if IsChartFile(Utils.GetFilenameFromPath(header.Name)) {
-				// Read the content of the file and unmarshal it in yaml format
-				var buf bytes.Buffer
-				if _, err := io.Copy(&buf, tarReader); err != nil {
-					Logger.Error("Error when reading Chart.yaml file")
-					return
-				}
-				var dataFile Entity.ChartFile
-				err := yaml.Unmarshal(buf.Bytes(), &dataFile)
-				if err != nil {
-					Logger.Error("Error in the YAML file, unable to deserialize it")
-				}
-
-				// Create the DTO entity with the data from file
-				path := Utils.GenerateChartPath(Utils.GetFilenameFromPath(file.Name()))
-				var dto = Utils.ParserChartToDTO(dataFile, path)
-
-				// Insert to the database
-				Database.InsertChart(dto)
-				break
-			}
-		}
-	}
+	defer file.Close()
 }
 
 /*
 deleteDBFromRemoveFile Delete on the DB when a .tar file is removed
 */
 func deleteDBFromRemoveFile(filepath string) {
-	result := Database.GetChartByFilename(Utils.GetFilenameFromPath(filepath))
+	result := Database.GetChartByFilename(Utils.GenerateChartPath(Utils.GetFilenameFromPath(filepath)))
 
 	if result.Err() != nil {
 		Logger.Warning(result.Err().Error())

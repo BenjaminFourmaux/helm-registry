@@ -8,7 +8,9 @@ func DeleteChart(id int) (sql.Result, error) {
 	return DB.Exec(`DELETE FROM charts WHERE id = @id`, id)
 }
 
-// DeleteCharts Delete all charts via id passed in list parameter
+/*
+DeleteCharts Delete all charts via id passed in list parameter
+*/
 func DeleteCharts(ids []int) error {
 	var err error
 

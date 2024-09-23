@@ -39,8 +39,8 @@ func Error(message string) {
 	println(getCurrentDatetime() + introducer + "ERROR" + separator + message)
 }
 
-func Raise(err string) {
-	println(err)
+func Raise(err error) {
+	println(err.Error())
 }
 
 func Separator() {
@@ -53,7 +53,7 @@ func Welcome() {
 	println("Ahoy!")
 	println("A simple Helm chart registry")
 	println()
-	println("Version :", "1.5.0")
+	println("Version :", "2.0.0")
 	println()
 	Info("App is going to start ...")
 }

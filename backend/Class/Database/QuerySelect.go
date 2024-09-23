@@ -56,29 +56,12 @@ func GetChartByCriteria(chart Entity.ChartDTO) (*sql.Rows, error) {
 	return DB.Query("SELECT id from charts")
 }
 
-/*
-GetRepositoriesCharts Get distinct charts (by name) with last version
-*/
-func GetRepositoriesCharts() *sql.Rows {
-	var queryResult, _ = DB.Query(`
-		SELECT *
-		FROM charts c1
-		WHERE c1.version = (
-			SELECT MAX(c2.version)
-			FROM charts c2
-			WHERE c2.name = c1.name
-		);
-	`)
-
-	return queryResult
-}
-
 // </editor-fold>
 
 // <editor-fold desc="For Table: registry">
 
 func GetInfo() *sql.Row {
-	return DB.QueryRow(`SELECT *  FROM registry LIMIT 1;`)
+	return DB.QueryRow(`SELECT * FROM registry;`)
 }
 
 // </editor-fold>

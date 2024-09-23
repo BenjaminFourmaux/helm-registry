@@ -1,83 +1,53 @@
 package Directory
 
 import (
-	"archive/tar"
-	"backend/Class/Database"
 	"backend/Class/Logger"
-	"backend/Class/Utils"
 	"backend/Class/Utils/env"
 	"backend/Entity"
+	"errors"
 	"fmt"
-	"gopkg.in/yaml.v2"
-	"io"
+	"helm.sh/helm/v3/pkg/chart"
+	"helm.sh/helm/v3/pkg/chart/loader"
+	"helm.sh/helm/v3/pkg/repo"
 	"os"
 	"path/filepath"
-	"reflect"
-	"strings"
-	"time"
 )
 
+/*
+UpdateIndex Update index.yaml using Helm SDK
+*/
 func UpdateIndex() {
-	filePath := env.INDEX_FILE_PATH
+	Logger.Info("Updating index.yaml file")
 
-	Logger.Info("Updating Index")
-
-	// Step 1. Get registry info from Database
-	rows, errSql := Database.GetALlChartsOrderedByName()
-	if errSql != nil {
-		Logger.Error("Unable to get data from Database")
-	}
-
-	// Step 2. Build the file
-	index := Entity.Index{
-		APIVersion: "v1",
-		Entries:    make(map[string][]Entity.ChartEntry),
-		Generated:  time.Now(),
-	}
-
-	// Step 3. Foreach rows
-	// TODO: refactor to use a PARSER from Utils
-	for rows.Next() {
-		var entry Entity.ChartDTO
-
-		if err := rows.Scan(&entry.Id, &entry.Name, &entry.Description, &entry.Version, &entry.Created, &entry.Digest,
-			&entry.Path, &entry.Home, &entry.Sources); err != nil {
-			Logger.Error("Deserialization data -> dto")
-		}
-
-		// Create entry
-		chartEntry := Entity.ChartEntry{
-			Version:     entry.Version,
-			Created:     entry.Created,
-			Name:        entry.Name,
-			Description: Utils.NullToString(entry.Description),
-			Digest:      entry.Digest,
-			Home:        Utils.NullToString(entry.Home),
-			Sources:     strings.Split(Utils.NullToString(entry.Sources), ";"),
-		}
-
-		// Add entry in file content
-		index.Entries[entry.Name] = append(index.Entries[entry.Name], chartEntry)
-	}
-
-	// Step 4. Check if change needed
-	yamlFile := &Entity.Index{}
-	err := yaml.Unmarshal(ReadFile(filePath), yamlFile)
+	// Get all charts in REPOSITORY_DIR (/charts), extract their information and build an index
+	indexFile, err := repo.IndexDirectory(env.REPOSITORY_DIR, fmt.Sprintf("%s://%s:%d/charts", env.Scene, env.Hostname, env.Port))
 	if err != nil {
-		Logger.Error("Unable to unmarshal the index file")
+		Logger.Error("When getting charts")
+		Logger.Raise(err)
 	}
 
-	if CheckChange(yamlFile, &index) {
-		index.Generated = time.Now()
-		yamlData, _ := yaml.Marshal(&index)
-
-		// Step 5. Save index YAML file
-		SaveFile(filePath, yamlData)
-
-		Logger.Success("Index successfully updated")
-	} else {
-		Logger.Info("Index - No change needed")
+	err = indexFile.WriteFile(env.INDEX_FILE_PATH, os.FileMode(0777))
+	if err != nil {
+		Logger.Error("Writing index.yaml file")
+		Logger.Raise(err)
 	}
+}
+
+/*
+GetDigestFromIndexFile Get index information from REPOSITORY_DIR and get digest from selected chart
+*/
+func GetDigestFromIndexFile(chart *chart.Chart) string {
+	indexFile, err := repo.IndexDirectory(env.REPOSITORY_DIR, fmt.Sprintf("%s://%s:%d/charts", env.Scene, env.Hostname, env.Port))
+	if err != nil {
+		Logger.Error("When getting charts")
+		Logger.Raise(err)
+	}
+
+	if indexFile.Has(chart.Name(), chart.Metadata.Version) {
+		indexInfo, _ := indexFile.Get(chart.Name(), chart.Metadata.Version)
+		return indexInfo.Digest
+	}
+	return ""
 }
 
 func ReadFile(filePath string) []byte {
@@ -96,44 +66,55 @@ func SaveFile(filePath string, data []byte) {
 	}
 }
 
-// CheckChange Compare oldYaml with newYaml and return true if there are a change
-func CheckChange(oldYaml *Entity.Index, newYaml *Entity.Index) bool {
-	// Remove 'generated' field
-	oldYaml.Generated = time.Time{}
-	newYaml.Generated = time.Time{}
-
-	return !reflect.DeepEqual(*oldYaml, *newYaml)
-}
-
-// IsTGZArchive Return true if the file (or path+file) extension is .tgz
+/*
+IsTGZArchive Return true if the file (or path+file) extension is .tgz
+*/
 func IsTGZArchive(path string) bool {
-	// TODO: Panic error if not a really .tgz file (.zip impostor). Maybe more verification
 	return filepath.Ext(path) == ".tgz"
 }
 
-// IsAChartPackage Check if in the zip has the requirement to be a Helm Chart (Chart.yaml)
-func IsAChartPackage(fileReader *tar.Reader) bool {
-	fmt.Println(fileReader)
-	for {
-		header, err := fileReader.Next()
-		if err == io.EOF {
-			break
-		}
-		if header.Typeflag == tar.TypeReg {
-			if header.Name == "Chart.yaml" || header.Name == "Chart.yml" {
-				return true
-			}
-		}
+/*
+IsFileExist Check if a file exist
+*/
+func IsFileExist(path string) bool {
+	if _, err := os.Stat(path); errors.Is(err, os.ErrNotExist) {
+		return false
+	} else {
+		return true
 	}
-	return false
 }
 
-// IsChartFile Return true if the filename match with Helm chart file naming rule
+/*
+IsAChartPackage Check if the file is a Chart archive using LoadArchive from Helm SDK
+*/
+func IsAChartPackage(pathFile string) bool {
+	archive, err := os.Open(pathFile)
+	if err != nil {
+		Logger.Error("Can't open archive")
+		Logger.Raise(err)
+		return false
+	}
+
+	_, err = loader.LoadArchive(archive)
+	defer archive.Close()
+	if err != nil {
+		Logger.Debug(err.Error())
+		return false
+	}
+
+	return true
+}
+
+/*
+IsChartFile Return true if the filename match with Helm chart file naming rule
+*/
 func IsChartFile(filename string) bool {
 	return filename == "Chart.yaml" || filename == "Chart.yml" || filename == "chart.yaml" || filename == "chart.yml"
 }
 
-// IsFilenameInDirectoryFiles Return true if the filename is on the directory (list of present filename)
+/*
+IsFilenameInDirectoryFiles Return true if the filename is on the directory (list of present filename)
+*/
 func IsFilenameInDirectoryFiles(filename string, list []string) bool {
 	for _, item := range list {
 		if item == filename {
@@ -141,4 +122,28 @@ func IsFilenameInDirectoryFiles(filename string, list []string) bool {
 		}
 	}
 	return false
+}
+
+/*
+IsOnList Search on ChartDTO list if a chart from file exist
+*/
+func IsOnList(chart *chart.Chart, list []Entity.ChartDTO) bool {
+	for _, item := range list {
+		if item.Name == chart.Name() && item.Version == chart.Metadata.Version {
+			return true
+		}
+	}
+	return false
+}
+
+/*
+GetOnList Get on ChartDTO list match chart
+*/
+func GetOnList(chart *chart.Chart, list []Entity.ChartDTO) Entity.ChartDTO {
+	for _, item := range list {
+		if item.Name == chart.Name() && item.Version == chart.Metadata.Version {
+			return item
+		}
+	}
+	return Entity.ChartDTO{}
 }
