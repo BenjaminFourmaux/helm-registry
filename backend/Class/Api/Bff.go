@@ -26,9 +26,9 @@ func EndpointBFFHome() {
 
 		chartInfo.Scan(&infoDTO.Name, &infoDTO.Description, &infoDTO.Version, &infoDTO.Maintainer, &infoDTO.MaintainerUrl, &infoDTO.Labels)
 
-		var query = Database.GetRepositoriesCharts()
-		if query.Err() != nil {
-			fmt.Println(query.Err())
+		var query, err = Database.GetAllCharts()
+		if err != nil {
+			fmt.Println(err)
 		}
 		count := 0
 		for query.Next() {
