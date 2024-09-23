@@ -57,8 +57,10 @@ jobs:
       env:
         CGO_ENABLED: 1
 
-    # Exporter les logs de l'API
-    - name: Export API logs
+    - name: Show results
       run: |
+        echo "tree folder"
+        ls -R ./backend
+        echo ""
         echo "API Logs:"
         cat ./backend/api.log
