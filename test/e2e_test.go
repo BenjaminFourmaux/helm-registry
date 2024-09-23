@@ -2,6 +2,7 @@ package test
 
 import (
 	"database/sql"
+	"strconv"
 	_ "github.com/mattn/go-sqlite3"
 	"gopkg.in/yaml.v2"
 	"gotest.tools/v3/assert"
@@ -99,13 +100,18 @@ func TestAddChartStateDB(t *testing.T) {
 //<editor-fold desc="Compare Functions">
 
 func compareNbChartsInDB(assert int) bool {
-	result, _ := db.Query(`SELECT * FROM charts`)
+	result, err := db.Query(`SELECT * FROM charts`)
+	if err != nil {
+		println(err.Error())
+		return false
+	}
 
 	var count = 0
 
 	for result.Next() {
 		count++
 	}
+	println("number of result: ", strconv.Itoa(count))
 	return assert == count
 }
 
