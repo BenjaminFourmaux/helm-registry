@@ -1,5 +1,6 @@
 :root {
     --color-helm-darkblue: #091C84;
+    font-size: 20px;
 }
 
 html, body {
@@ -21,7 +22,7 @@ a, .btn-link {
 }
 
 .content {
-    padding-top: 1.1rem;
+/*    padding-top: 1.1rem;*/
 }
 
 h1:focus {
@@ -59,7 +60,7 @@ h1:focus {
     background: var(--color-helm-darkblue);
 }
 .color-darkblue {
-        color: var(--color-helm-darkblue);
+    color: var(--color-helm-darkblue);
 }
 
 /* Shared */
@@ -76,9 +77,12 @@ h1:focus {
     background-color: var(--color-helm-darkblue);
     border-color: var(--color-helm-darkblue);
 }
+.bb-sidebar-top-row .container-fluid {
+    padding-left: calc(var(--bs-gutter-x) * .5) !important;
+}
 
 .bb-page .bb-sidebar nav .nav-item a.active {
-    color:  var(--color-helm-darkblue);
+    color: var(--color-helm-darkblue);
 }
 
 .bb-page .bb-sidebar nav .nav-item a:hover {

@@ -14,6 +14,14 @@
             <h5 class="registry-description">@homeData.Description</h5>
         </div>
 
+        @if (BackendAPI.RegistryInfo != null)
+        {
+            <h1>Bite</h1>
+            <h2>@BackendAPI.RegistryInfo.Name</h2>
+        } else         {
+            <h1>Empty</h1>
+        }   
+
         <hr/>
 
         <div class="row justify-content-center">
@@ -57,10 +65,11 @@
 </div>
 
 @code {
-    private BackendAPIHomeResponse homeData = new BackendAPIHomeResponse();
+    private RegistryInfo homeData = new RegistryInfo();
 
-    protected override async Task OnInitializedAsync()
-    {
-        homeData = await BackendAPI.GetHomeData();
-    }
+
+    // protected override async Task OnInitializedAsync()
+    // {
+
+    // }
 }

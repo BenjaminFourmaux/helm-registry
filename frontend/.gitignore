@@ -1,3 +1,7 @@
+# Build artifact
+bin
+obj
+
 # CSS & JS libs
 wwwroot/css/bootstrap*.css
 wwwroot/css/fonts/bootstrap-icons.woff*
