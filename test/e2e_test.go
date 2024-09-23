@@ -60,7 +60,7 @@ func TestInitStateIndex(t *testing.T) {
 
 func TestMoveChartOutside(t *testing.T) {
 	t.Log("Move test-chart-0.1.0.tgz file outside CHART_DIR")
-	assert.Assert(t, moveFile("chart\\test-chart-0.1.0.tgz", "."))
+	assert.Assert(t, moveFile("chart/test-chart-0.1.0.tgz", "."))
 	time.Sleep(2 * time.Second)
 	t.Log("file: test-chart-0.1.0.tgz moved")
 }
