@@ -31,8 +31,8 @@ jobs:
     # Run API
     - name: Run
       working-directory: ./backend
-      run: go run .
-      #run: nohup go run . &
+      #run: go run .
+      run: nohup go run . &
       env:
         CGO_ENABLED: 1
         REPOSITORY_DIR: "../test/chart"
