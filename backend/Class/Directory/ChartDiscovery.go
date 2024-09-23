@@ -121,6 +121,18 @@ func actionTrigger(event fsnotify.Event) {
 			Logger.Info("Action - delete")
 			deleteDBFromRemoveFile(event.Name)
 		}
+	case "RENAME":
+		if IsTGZArchive(event.Name) {
+			// Check if file was removed
+			if !IsFileExist(event.Name) {
+				Logger.Info("Action - delete")
+				deleteDBFromRemoveFile(event.Name)
+			} else {
+				// No effect (CREATE trigger before)
+				// This case spawn in GitHub Action Worker (Ubuntu) but not in my pc (Windows)
+				// I think rename is a specific case for Unix folder manager (move via os.rename GO)
+			}
+		}
 	}
 	// Update index.yaml file after action triggering and database change
 	UpdateIndex()

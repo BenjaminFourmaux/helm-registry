@@ -4,6 +4,7 @@ import (
 	"backend/Class/Logger"
 	"backend/Class/Utils/env"
 	"backend/Entity"
+	"errors"
 	"fmt"
 	"helm.sh/helm/v3/pkg/chart"
 	"helm.sh/helm/v3/pkg/chart/loader"
@@ -70,6 +71,17 @@ IsTGZArchive Return true if the file (or path+file) extension is .tgz
 */
 func IsTGZArchive(path string) bool {
 	return filepath.Ext(path) == ".tgz"
+}
+
+/*
+IsFileExist Check if a file exist
+*/
+func IsFileExist(path string) bool {
+	if _, err := os.Stat(path); errors.Is(err, os.ErrNotExist) {
+		return false
+	} else {
+		return true
+	}
 }
 
 /*
