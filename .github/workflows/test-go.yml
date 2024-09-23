@@ -59,8 +59,10 @@ jobs:
 
     - name: Show results
       run: |
-        echo "tree folder"
+        echo "tree folders"
         ls -R ./backend
+        echo ""
+        ls -R ./test
         echo ""
         echo "API Logs:"
         cat ./backend/api.log
