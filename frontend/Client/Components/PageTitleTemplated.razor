@@ -1,0 +1,10 @@
+﻿@using frontend.Services
+@inject BackendAPI BackendAPIService
+
+<PageTitle>@ChildContent @(BackendAPIService.RegistryInfo != null && BackendAPIService.RegistryInfo.Name != null ? "- " + BackendAPIService.RegistryInfo.Name + " " : "")- Helm Registry
+</PageTitle>
+
+@code {
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+}
