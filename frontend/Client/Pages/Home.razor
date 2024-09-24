@@ -2,7 +2,7 @@
 @using frontend.Client.Components
 @using frontend.Models
 @using frontend.Services
-@inject BackendAPI BackendAPI
+@inject BackendAPI BackendAPIService
 
 <PageTitle>Home</PageTitle>
 
@@ -13,14 +13,6 @@
             <h2 class="registry-name">@homeData.Name</h2>
             <h5 class="registry-description">@homeData.Description</h5>
         </div>
-
-        @if (BackendAPI.RegistryInfo != null)
-        {
-            <h1>Bite</h1>
-            <h2>@BackendAPI.RegistryInfo.Name</h2>
-        } else         {
-            <h1>Empty</h1>
-        }   
 
         <hr/>
 
@@ -64,12 +56,12 @@
     </div>
 </div>
 
+
 @code {
-    private RegistryInfo homeData = new RegistryInfo();
+    private RegistryInfo homeData;
 
-
-    // protected override async Task OnInitializedAsync()
-    // {
-
-    // }
+    protected override void OnInitialized()
+    {
+        homeData = BackendAPIService.RegistryInfo;
+    }
 }

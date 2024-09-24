@@ -1,7 +1,4 @@
-﻿@using frontend.Services
-@inject BackendAPI BackendAPI
-
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -31,11 +28,3 @@
 </body>
 
 </html>
-
-@code {
-    protected override async Task OnInitializedAsync()
-    {
-        await BackendAPI.GetRegistryInfoAsync();
-        Console.WriteLine("RegistryInfo: ", BackendAPI.RegistryInfo.Name);
-    }
-}

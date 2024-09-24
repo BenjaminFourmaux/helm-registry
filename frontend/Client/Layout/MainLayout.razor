@@ -1,4 +1,6 @@
 ﻿@inherits LayoutComponentBase
+@using frontend.Services
+@inject BackendAPI BackendAPIService
 
 <div class="bb-page">
 
@@ -25,6 +27,12 @@
 @code {
     Sidebar sidebar;
     IEnumerable<NavItem> navItems;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await BackendAPIService.GetRegistryInfoAsync();
+    }
+
 
     private async Task<SidebarDataProviderResult> SidebarDataProvider(SidebarDataProviderRequest request)
     {

@@ -13,7 +13,7 @@ builder.Services.AddHttpClient("backendAPI", config =>
     config.BaseAddress = new Uri("http://localhost:8080/");
 });
 
-builder.Services.AddScoped<BackendAPI>();
+builder.Services.AddSingleton<BackendAPI>();
 
 // Add BlazorBootstrap service
 builder.Services.AddBlazorBootstrap();

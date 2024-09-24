@@ -27,7 +27,8 @@ namespace frontend.Services
 
             var content = await response.Content.ReadAsStringAsync();
             Console.WriteLine(content);
-            return JsonSerializer.Deserialize<RegistryInfo>(content, new JsonSerializerOptions{ PropertyNameCaseInsensitive = true,})!;;
+            var objectData = JsonSerializer.Deserialize<RegistryInfo>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true, });
+            return objectData;
         }
 
         public async void Ping()
