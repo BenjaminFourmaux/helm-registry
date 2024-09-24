@@ -13,7 +13,7 @@
     <main>
         <div class="bb-top-row px-4 d-flex justify-content-between">
             <div></div>
-            <h1 id="main-title">My Helm registry</h1>
+            <h1 id="main-title">@(BackendAPIService.RegistryInfo.Name != null ? BackendAPIService.RegistryInfo.Name : "Helm Registry")</h1>
             <a href="https://github.com/BenjaminFourmaux/Helm-Registry/" target="_blank"><Icon Name="IconName.Github" /> About</a>
         </div>
 
@@ -48,7 +48,8 @@
                    {
                        new NavItem { Id = "1", Href = "/", IconName = IconName.HouseDoorFill, Text = "Home", Match=NavLinkMatch.All},
                        new NavItem { Id = "2", Href = "/repositories", IconName = IconName.ArchiveFill, Text = "Repositories"},
-                       new NavItem { Id = "3", Href = "/settings", IconName = IconName.GearFill, Text = "Settings"},
+                       new NavItem { Id = "3", Href = "/icons", IconName = IconName.CardImage, Text = "Icons"},
+                       new NavItem { Id = "4", Href = "/settings", IconName = IconName.GearFill, Text = "Settings"},
                    };
                    
         return navItems;

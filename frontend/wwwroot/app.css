@@ -70,6 +70,13 @@ h1:focus {
     color: var(--color-helm-darkblue);
     margin-bottom: unset;
 }
+.registry-info-label {
+    font-weight: 700;
+    font-size: 1.4rem;
+}
+.registry-info-value {
+    font-size: 1.2rem;
+}
 /* ---- */
 
 /* Nav bar */
@@ -102,7 +109,7 @@ h1:focus {
 }
 /* ---- */
 
-/* Component TagInput */
+/* Component - TagInput */
 .tagInput {
     background-color: #fff;
     border: 1px solid #ccc;
@@ -133,6 +140,10 @@ h1:focus {
 }
 .tagInput .tag.tag-info {
     background-color: var(--bs-info);
+    color: #ffffff;
+}
+.tagInput .tag.tag-helm {
+    background-color: var(--color-helm-darkblue);
     color: #ffffff;
 }
 /* ---- */

@@ -20,7 +20,7 @@ namespace frontend.Models
             {
                 foreach (string label in this.Labels)
                 {
-                    listTags.Add(new TagItem(label, "secondary"));
+                    listTags.Add(new TagItem(label, "helm"));
                 }
             }
             return listTags.ToArray();
