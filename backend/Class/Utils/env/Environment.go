@@ -17,6 +17,7 @@ var (
 	REGISTRY_MAINTAINER     string // REGISTRY_MAINTAINER Env var - Name of the maintainer of this registry
 	REGISTRY_MAINTAINER_URL string // REGISTRY_MAINTAINER_URL Env var - URL of the maintainer of this registry
 	REGISTRY_LABELS         string // REGISTRY_LABELS Env var - List of labels for this registry
+	ICONS_DIR               string // ICONS_DIR Env var - Directory path of chart's icons
 )
 
 var Scene = "http"
@@ -42,6 +43,15 @@ func SetupEnv() {
 		}
 	}
 
+	if os.Getenv("ICONS_DIR") == "" {
+		if runtime.GOOS == "windows" {
+			userDocs := os.Getenv("USERPROFILE") + "\\Documents\\helm-registry\\icons"
+			_ = os.Setenv("ICONS_DIR", userDocs)
+		} else {
+			_ = os.Setenv("ICONS_DIR", "/usr/helm-registry/icons")
+		}
+	}
+
 	// Save env var change after permutation in class properties
 	INDEX_FILE_PATH = os.Getenv("INDEX_FILE_PATH")
 	REPOSITORY_DIR = os.Getenv("REPOSITORY_DIR")
@@ -51,6 +61,7 @@ func SetupEnv() {
 	REGISTRY_MAINTAINER = os.Getenv("REGISTRY_MAINTAINER")
 	REGISTRY_MAINTAINER_URL = os.Getenv("REGISTRY_MAINTAINER_URL")
 	REGISTRY_LABELS = os.Getenv("REGISTRY_LABELS")
+	ICONS_DIR = os.Getenv("ICONS_DIR")
 
 	// Create directories
 

@@ -123,20 +123,15 @@ func EndpointIndexYAML() {
 }
 
 func EndpointCharts() {
-	chartDir := env.REPOSITORY_DIR
-	chartHandler := http.FileServer(http.Dir(chartDir))
+	chartsHandler := http.FileServer(http.Dir(env.REPOSITORY_DIR))
 
-	http.HandleFunc("/charts/", func(w http.ResponseWriter, req *http.Request) {
-		traceRequest(req)
+	http.Handle("/charts/", http.StripPrefix("/charts/", chartsHandler))
+}
 
-		if !strings.Contains(req.URL.Path, "/charts/") {
-			Logger.Warning("404 not found")
-			http.NotFound(w, req)
-			return
-		}
+func EndpointIcons() {
+	iconHandler := http.FileServer(http.Dir(env.ICONS_DIR))
 
-		http.StripPrefix("/charts/", chartHandler)
-	})
+	http.Handle("/icons/", http.StripPrefix("/icons/", iconHandler))
 }
 
 // </editor-fold>

@@ -41,6 +41,7 @@ func main() {
 	Api.EndpointHelpRedirect()
 	Api.EndpointIndexYAML()
 	Api.EndpointCharts()
+	Api.EndpointIcons()
 	Api.EndpointBFFHome()
 
 	// Start HTTP Server
