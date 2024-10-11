@@ -8,3 +8,8 @@ type BffHomeResponse struct {
 	Labels        []string `json:"labels"`
 	NumberOfRepos int      `json:"number_of_repos"`
 }
+
+type IconResponse struct {
+	Name string `json:"name"`
+	Uri  string `json:"uri"`
+}

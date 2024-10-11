@@ -42,7 +42,9 @@ func main() {
 	Api.EndpointIndexYAML()
 	Api.EndpointCharts()
 	Api.EndpointIcons()
+	// -- BFF endpoints
 	Api.EndpointBFFHome()
+	Api.EndpointBFFIcons()
 
 	// Start HTTP Server
 	Logger.Info("Start HTTP Server")

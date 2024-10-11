@@ -2,18 +2,19 @@ package Api
 
 import (
 	"backend/Class/Database"
+	"backend/Class/Directory"
 	"backend/Class/Logger"
+	"backend/Class/Utils/env"
 	"backend/Entity"
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"path/filepath"
 	"strings"
 )
 
 func EndpointBFFHome() {
 	http.HandleFunc("/bff/home", func(w http.ResponseWriter, req *http.Request) {
-		traceRequest(req)
-
 		if req.URL.Path != "/bff/home" {
 			Logger.Warning("404 not found")
 			http.NotFound(w, req)
@@ -52,5 +53,34 @@ func EndpointBFFHome() {
 		w.Header().Set("Content-Type", "application/json")
 
 		json.NewEncoder(w).Encode(response)
+	})
+}
+
+func EndpointBFFIcons() {
+	http.HandleFunc("/bff/icons", func(w http.ResponseWriter, req *http.Request) {
+		if req.URL.Path != "/bff/icons" {
+			Logger.Warning("404 not found")
+			http.NotFound(w, req)
+			return
+		}
+
+		icons, err := Directory.ListFiles(env.ICONS_DIR, []string{".png", ".jpg", ".svg"})
+		if err != nil {
+			Logger.Error("Failed to list icons")
+			http.Error(w, "Failed to list icons", http.StatusInternalServerError)
+			return
+		}
+
+		var iconList []Entity.IconResponse
+		for _, icon := range icons {
+			iconName := strings.TrimSuffix(icon, filepath.Ext(icon))
+			iconList = append(iconList, Entity.IconResponse{
+				Name: iconName,
+				Uri:  fmt.Sprintf("%s://%s:%d/icons/%s", env.Scene, env.Hostname, env.Port, icon),
+			})
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(iconList)
 	})
 }

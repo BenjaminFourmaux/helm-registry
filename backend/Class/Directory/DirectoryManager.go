@@ -147,3 +147,32 @@ func GetOnList(chart *chart.Chart, list []Entity.ChartDTO) Entity.ChartDTO {
 	}
 	return Entity.ChartDTO{}
 }
+
+/*
+ListFiles lists all files in a directory with specified extensions
+*/
+func ListFiles(directory string, extensions []string) ([]string, error) {
+	var files []string
+
+	err := filepath.Walk(directory, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		if !info.IsDir() {
+			for _, ext := range extensions {
+				if filepath.Ext(path) == ext {
+					files = append(files, info.Name())
+					break
+				}
+			}
+		}
+		return nil
+	})
+
+	if err != nil {
+		Logger.Error("Error listing files in directory: " + directory)
+		return nil, err
+	}
+
+	return files, nil
+}
