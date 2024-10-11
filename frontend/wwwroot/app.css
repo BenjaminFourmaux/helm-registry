@@ -160,10 +160,11 @@ a.link-style {
 /* ---- */
 /* Component - BlockCode */
 .block-code {
+    position: relative;
     font-family: monospace;
     border-radius: 8px;
     padding: 8px;
-    position: relative;
+    padding-bottom: 1.2rem;
 }
 .block-code span.lang {
     position: absolute;

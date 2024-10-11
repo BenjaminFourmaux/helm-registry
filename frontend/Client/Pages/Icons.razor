@@ -1,5 +1,8 @@
 ﻿@page "/icons"
 @using frontend.Client.Components
+@using frontend.Models
+@using frontend.Services
+@inject BackendAPI BackendAPIService
 
 <PageTitleTemplated>Icons</PageTitleTemplated>
 
@@ -23,12 +26,11 @@
 
         <BlockCode Language="yaml" Theme="dark" ShowLang="true">
             <Filename>Chart.yaml</Filename>
-            <ChildContent>
-name: My_Chart
+
+<ChildContent>name: My_Chart
 description: My amazing chart
 ...
-icon: https://my-registry.lan/icons/my_chart.png
-            </ChildContent>
+icon: https://my-registry.lan/icons/my_chart.png</ChildContent>
         </BlockCode>
 
         <p>
@@ -39,6 +41,7 @@ icon: https://my-registry.lan/icons/my_chart.png
 </Modal>
 
 @code {
+    private List<IconsItem> iconList;
     private Modal modalIncludeChartIcon;
     private async Task OnShowModalIncludeChartIconClick()
     {
@@ -48,4 +51,10 @@ icon: https://my-registry.lan/icons/my_chart.png
     {
         await modalIncludeChartIcon.HideAsync();
     }
+
+    protected override async Task OnInitializedAsync()
+    {
+        iconList = await BackendAPIService.GetIconsList();
+    }
+
 }

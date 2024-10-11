@@ -31,6 +31,17 @@ namespace frontend.Services
             return objectData;
         }
 
+        public async Task<List<IconsItem>> GetIconsList()
+        {
+            var response = await _client.GetAsync("/bff/icons");
+            response.EnsureSuccessStatusCode();
+
+            var content = await response.Content.ReadAsStringAsync();
+            Console.WriteLine(content);
+            var objectData = JsonSerializer.Deserialize<List<IconsItem>>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true, });
+            return objectData;
+        }
+
         public async void Ping()
         {
             await _client.GetAsync("/");
