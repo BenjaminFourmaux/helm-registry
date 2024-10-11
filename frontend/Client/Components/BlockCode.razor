@@ -1,0 +1,35 @@
+﻿<pre class="block-code @(Theme == "dark" ? "theme-dark" : "")">
+
+    @if (Filename != null)
+    {
+        <div class="filename">@Filename</div>
+    }
+
+    @if (ShowLang)
+    {
+        <span class="lang">@Language</span>
+    }
+
+    <code>
+@ChildContent
+    </code>
+</pre>
+
+
+
+@code {
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+
+    [Parameter]
+    public RenderFragment Filename { get; set; }
+    
+    [Parameter]
+    public string Theme { get; set; }
+    
+    [Parameter]
+    public string Language { get; set; }
+    
+    [Parameter]
+    public bool ShowLang { get; set; } = true;
+}

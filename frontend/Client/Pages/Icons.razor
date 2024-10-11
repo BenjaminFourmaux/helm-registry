@@ -1,0 +1,51 @@
+﻿@page "/icons"
+@using frontend.Client.Components
+
+<PageTitleTemplated>Icons</PageTitleTemplated>
+
+<div class="page-top-banner">
+    <h2>Icons</h2>
+    <p>
+        All your charts icons found in your registry.
+        <br />
+        See <a @onclick="OnShowModalIncludeChartIconClick" class="link-style">how to add an icon to a chart</a>
+    </p>
+</div>
+
+
+<Modal @ref="modalIncludeChartIcon" Title="Include Chart Icon" Size="ModalSize.Large">
+    <BodyTemplate>
+        <p>
+            In your Chart.yaml file add the property <code>icon: path_to_the_icons</code>.
+            <br />
+            Click on the copy button and paste the link in your Chart.yaml to refered the icon.
+        </p>
+
+        <BlockCode Language="yaml" Theme="dark" ShowLang="true">
+            <Filename>Chart.yaml</Filename>
+            <ChildContent>
+name: My_Chart
+description: My amazing chart
+...
+icon: https://my-registry.lan/icons/my_chart.png
+            </ChildContent>
+        </BlockCode>
+
+        <p>
+            You can see your chart's icon in a Kubernetes vizualizer like OpenShift topology.
+        </p>
+
+    </BodyTemplate>
+</Modal>
+
+@code {
+    private Modal modalIncludeChartIcon;
+    private async Task OnShowModalIncludeChartIconClick()
+    {
+        await modalIncludeChartIcon.ShowAsync();
+    }
+    private async Task OnHideModalIncludeChartIconClick()
+    {
+        await modalIncludeChartIcon.HideAsync();
+    }
+}

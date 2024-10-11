@@ -47,9 +47,9 @@ h1:focus {
     color: white;
 }
 
-    .blazor-error-boundary::after {
-        content: "An error has occurred."
-    }
+.blazor-error-boundary::after {
+    content: "An error has occurred."
+}
 
 .darker-border-checkbox.form-check-input {
     border-color: #929292;
@@ -61,6 +61,11 @@ h1:focus {
 }
 .color-darkblue {
     color: var(--color-helm-darkblue);
+}
+a.link-style {
+    color: blue;
+    text-decoration: underline;
+    cursor: pointer;
 }
 
 /* Shared */
@@ -76,6 +81,12 @@ h1:focus {
 }
 .registry-info-value {
     font-size: 1.2rem;
+}
+
+.page-top-banner {
+    text-align: center;
+    padding: 2rem;
+    border-bottom: 1px solid #ccc;
 }
 /* ---- */
 
@@ -145,5 +156,37 @@ h1:focus {
 .tagInput .tag.tag-helm {
     background-color: var(--color-helm-darkblue);
     color: #ffffff;
+}
+/* ---- */
+/* Component - BlockCode */
+.block-code {
+    font-family: monospace;
+    border-radius: 8px;
+    padding: 8px;
+    position: relative;
+}
+.block-code span.lang {
+    position: absolute;
+    top: 0;
+    right: 0;
+    margin-top: 8px;
+    margin-right: 8px;
+}
+.block-code div.filename {
+    text-align: center;
+    margin-bottom: 0;
+}
+.block-code code.highlight {
+
+}
+
+/* Color theme */
+.block-code.theme-dark {
+    background-color: #0d1117;
+    color: #f0f6fc;
+}
+.block-code.theme-dark span.lang,
+.block-code.theme-dark span.filename {
+    color: #9198a1;
 }
 /* ---- */
