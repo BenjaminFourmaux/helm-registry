@@ -1,5 +1,9 @@
 # Download CSS & JS lib
 
+New-Item -Path 'wwwroot/css/' -ItemType Directory
+New-Item -Path 'wwwroot/css/fonts' -ItemType Directory
+New-Item -Path 'wwwroot/js/' -ItemType Directory
+
 ## CSS libs
 Invoke-WebRequest -Uri "https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" -OutFile "wwwroot/css/bootstrap.min.css"
 Invoke-WebRequest -Uri "https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" -OutFile "wwwroot/css/bootstrap-icons.min.css"
