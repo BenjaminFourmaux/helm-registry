@@ -3,16 +3,44 @@
 @using frontend.Models
 @using frontend.Services
 @inject BackendAPI BackendAPIService
+@inject IJSRuntime JSRuntime
 
 <PageTitleTemplated>Icons</PageTitleTemplated>
 
 <div class="page-top-banner">
     <h2>Icons</h2>
     <p>
-        All your charts icons found in your registry.
+        All your charts icons found in your registry
         <br />
         See <a @onclick="OnShowModalIncludeChartIconClick" class="link-style">how to add an icon to a chart</a>
+        <br />
+        Click on icons below to copy url in clipboard
     </p>
+</div>
+
+<div>
+    @if (iconList != null)
+    {
+        <div class="row">
+            @foreach(var icon in iconList)
+            {
+                <div class="col-2">
+                    <Card class="my-3" onclick="@(() => OnCopyIconLinkClick(icon.Uri))">
+                        <div class="d-flex justify-content-center align-items-center m-2">
+                            <img src="@icon.Uri" class="w-75" />
+                        </div>
+                        <CardBody>
+                            <CardTitle class="text-center pt-2" style="border-top: 2px solid black; margin-bottom: 0;">@icon.Name</CardTitle>
+                        </CardBody>
+                    </Card>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <Loading />
+    }
 </div>
 
 
@@ -43,6 +71,13 @@ icon: https://my-registry.lan/icons/my_chart.png</ChildContent>
 @code {
     private List<IconsItem> iconList;
     private Modal modalIncludeChartIcon;
+    [Inject] protected ToastService ToastService { get; set; } = default!;
+
+    protected override async Task OnInitializedAsync()
+    {
+        iconList = await BackendAPIService.GetIconsList();
+    }
+
     private async Task OnShowModalIncludeChartIconClick()
     {
         await modalIncludeChartIcon.ShowAsync();
@@ -52,9 +87,14 @@ icon: https://my-registry.lan/icons/my_chart.png</ChildContent>
         await modalIncludeChartIcon.HideAsync();
     }
 
-    protected override async Task OnInitializedAsync()
+    private void OnCopyIconLinkClick(string uri)
     {
-        iconList = await BackendAPIService.GetIconsList();
+        // Copy the icon link to the clipboard
+        JSRuntime.InvokeVoidAsync("navigator.clipboard.writeText", uri);
+        ToastService.Notify(new ToastMessage {
+            Type = ToastType.Success,
+            IconName = IconName.Clipboard,
+            Message = "Icon link copied",
+        });
     }
-
 }

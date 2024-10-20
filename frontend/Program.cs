@@ -1,5 +1,6 @@
 using frontend.Client;
 using frontend.Services;
+using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,6 +18,7 @@ builder.Services.AddSingleton<BackendAPI>();
 
 // Add BlazorBootstrap service
 builder.Services.AddBlazorBootstrap();
+Console.WriteLine("Using BlazorBootstrap version: " + Assembly.GetAssembly(typeof(BlazorBootstrap.TypeExtensions)).GetName().Version.ToString());
 
 var app = builder.Build();
 
