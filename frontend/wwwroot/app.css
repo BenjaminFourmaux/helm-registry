@@ -87,6 +87,7 @@ a.link-style {
     text-align: center;
     padding: 2rem;
     border-bottom: 1px solid #ccc;
+    background-image: url(assets/img/topography.png);
 }
 /* ---- */
 
@@ -120,6 +121,11 @@ a.link-style {
 }
 /* ---- */
 
+/* Settings page */
+.form-group {
+    margin-bottom: 1rem;
+}
+
 /* Component - TagInput */
 .tagInput {
     background-color: #fff;
@@ -132,6 +138,7 @@ a.link-style {
     border-radius: 4px;
     max-width: 100%;
     cursor: text;
+    min-height: 2rem;
 }
 .tagInput .tag {
     display: inline-block;
@@ -156,6 +163,48 @@ a.link-style {
 .tagInput .tag.tag-helm {
     background-color: var(--color-helm-darkblue);
     color: #ffffff;
+}
+.tag-input {
+    display: inline-block;
+    position: relative;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 5px;
+    box-shadow: 2px 2px 5px #00000033;
+    width: 50%;
+}
+.tags-input ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+.tags-input li {
+    display: inline-block;
+    background-color: #f2f2f2;
+    color: #333;
+    border-radius: 20px;
+    padding: 5px 10px;
+    margin-right: 5px;
+    margin-bottom: 5px;
+}
+
+.tags-input input[type="text"] {
+    border: none;
+    outline: none;
+    padding: 5px;
+    font-size: 14px;
+}
+
+.tags-input input[type="text"]:focus {
+    outline: none;
+}
+
+.tags-input .delete-button {
+    background-color: transparent;
+    border: none;
+    color: #999;
+    cursor: pointer;
+    margin-left: 5px;
 }
 /* ---- */
 /* Component - BlockCode */

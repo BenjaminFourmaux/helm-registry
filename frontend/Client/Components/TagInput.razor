@@ -1,16 +1,31 @@
 ﻿@namespace frontend.Client.Components
 
-<div class="tagInput">
-    @foreach (var tag in Tags)
-    {
-         <span class="tag tag-@tag.color">@tag.label</span>
-        @* <Badge Color="BadgeColor.Primary">@tag.label</Badge> *@
-    }
-</div>
+
+@if(Editable){
+    <div class="tags-input">
+        <ul id="tags"></ul>
+        <input type="text" class="input-tag" placeholder="Enter a tag name" />
+    </div>
+}else
+{
+    <div class="tagInput">
+        @foreach (var tag in Tags)
+        {
+            <span class="tag tag-@tag.color">@tag.label</span>
+            @* <Badge Color="BadgeColor.Primary">@tag.label</Badge> *@
+        }
+    </div>
+}
 
 @code {
     @using frontend.Models
 
+
+
     [Parameter]
     public TagItem[] Tags { get; set; } = [];
+
+
+    [Parameter]
+    public bool Editable { get; set; } = false;
 }
